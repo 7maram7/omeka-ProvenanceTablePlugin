@@ -12,8 +12,7 @@ define('PROVENANCE_TABLE_PLUGIN_DIR', dirname(__FILE__));
 // Include the plugin class
 require_once PROVENANCE_TABLE_PLUGIN_DIR . '/ProvenanceTablePlugin.php';
 
-// Get the plugin broker and register the plugin
-$provenanceTablePlugin = new ProvenanceTablePlugin();
+// Note: Omeka automatically instantiates the plugin class, so we don't need to do it here
 
 // Hook to save provenance data when an item is saved
 add_filter('before_save_item', 'provenance_table_before_save_item');

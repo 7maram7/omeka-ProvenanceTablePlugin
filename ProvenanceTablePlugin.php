@@ -151,7 +151,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
     public function hookPublicHead($args)
     {
         if (get_option('provenance_table_enable_public')) {
-            queue_css_file('provenance-display', 'all', false, 'css');
+            queue_css_file('provenance-display');
         }
     }
 
