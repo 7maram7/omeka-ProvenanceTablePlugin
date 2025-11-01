@@ -1,0 +1,12 @@
+FILES TO COMPLETE:
+[ ] plugin.ini
+[ ] plugin.php
+[ ] ProvenanceTablePlugin.php
+[ ] config_form.php
+[ ] README.md
+[ ] INSTALL.txt
+[ ] QUICKSTART.md
+[ ] TESTING.md
+[ ] views/admin/javascripts/provenance-table.js
+[ ] views/admin/css/provenance-table.css
+[ ] views/public/css/provenance-display.css
