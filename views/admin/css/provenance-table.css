@@ -1,0 +1,189 @@
+/**
+ * Provenance Table Plugin - Admin CSS
+ * Styles for the admin interface
+ */
+
+/* Container */
+#provenance-table-container {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.provenance-instructions {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #e8f4f8;
+    border-left: 4px solid #2582a0;
+    color: #333;
+    font-size: 14px;
+}
+
+/* Table Styles */
+.provenance-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.provenance-table thead th {
+    background: #2582a0;
+    color: #fff;
+    padding: 10px 8px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    border-right: 1px solid #fff;
+}
+
+.provenance-table thead th:last-child {
+    border-right: none;
+}
+
+.provenance-table tbody tr {
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.2s;
+}
+
+.provenance-table tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.provenance-table tbody tr.ui-sortable-helper {
+    background-color: #fffacd;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.provenance-table tbody td {
+    padding: 8px;
+    vertical-align: top;
+}
+
+/* Drag Handle */
+.drag-handle {
+    cursor: move;
+    text-align: center;
+    width: 50px;
+    background: #f0f0f0;
+}
+
+.drag-handle:hover {
+    background: #e0e0e0;
+}
+
+.order-number {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    background: #2582a0;
+    color: #fff;
+    border-radius: 50%;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+/* Form Inputs */
+.provenance-table input[type="text"],
+.provenance-table textarea,
+.provenance-table select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+.provenance-table input[type="text"]:focus,
+.provenance-table textarea:focus,
+.provenance-table select:focus {
+    border-color: #2582a0;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(37, 130, 160, 0.1);
+}
+
+.provenance-table textarea {
+    resize: vertical;
+    min-height: 50px;
+}
+
+/* Delete Button */
+.delete-entry {
+    background: #d9534f;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.2s;
+}
+
+.delete-entry:hover {
+    background: #c9302c;
+}
+
+/* Add Entry Button */
+.add-provenance-entry {
+    background: #5cb85c;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.add-provenance-entry:hover {
+    background: #4cae4c;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 1200px) {
+    .provenance-table {
+        font-size: 12px;
+    }
+
+    .provenance-table input[type="text"],
+    .provenance-table textarea,
+    .provenance-table select {
+        font-size: 12px;
+        padding: 5px 6px;
+    }
+}
+
+/* Column widths */
+.provenance-table td:nth-child(1) { width: 50px; }  /* Order */
+.provenance-table td:nth-child(2) { min-width: 150px; }  /* Owner */
+.provenance-table td:nth-child(3) { width: 120px; }  /* Date From */
+.provenance-table td:nth-child(4) { width: 120px; }  /* Date To */
+.provenance-table td:nth-child(5) { min-width: 120px; }  /* Location */
+.provenance-table td:nth-child(6) { min-width: 120px; }  /* Source */
+.provenance-table td:nth-child(7) { width: 130px; }  /* Transaction Type */
+.provenance-table td:nth-child(8) { width: 100px; }  /* Price */
+.provenance-table td:nth-child(9) { min-width: 150px; }  /* Notes */
+.provenance-table td:nth-child(10) { width: 80px; }  /* Actions */
+
+/* Sortable placeholder */
+.provenance-table .ui-sortable-placeholder {
+    background: #e8f4f8;
+    visibility: visible !important;
+    height: 50px;
+}
+
+/* Empty state */
+.provenance-table tbody:empty::after {
+    content: "No provenance entries yet. Click 'Add Entry' to create one.";
+    display: block;
+    padding: 20px;
+    text-align: center;
+    color: #999;
+    font-style: italic;
+}
