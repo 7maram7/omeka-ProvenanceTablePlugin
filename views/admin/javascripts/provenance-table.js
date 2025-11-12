@@ -14,12 +14,42 @@
      * Initialize provenance table transformation
      */
     function initProvenanceTable() {
-        // Find the Provenance field textarea
-        // It's typically in the Item Type Metadata section with a label containing "Provenance"
-        var $provenanceField = findProvenanceField();
+        // Check if configuration is available
+        if (typeof ProvenanceTableConfig === 'undefined' || !ProvenanceTableConfig) {
+            console.log('ProvenanceTableConfig not found - plugin may not be configured');
+            return;
+        }
+
+        // Get current item type ID from the page
+        var itemTypeId = getCurrentItemTypeId();
+
+        if (!itemTypeId) {
+            console.log('Item type ID not found - may be adding new item');
+            // Try to find field anyway using fallback method
+            itemTypeId = 'fallback';
+        }
+
+        console.log('Item Type ID:', itemTypeId);
+        console.log('Configuration:', ProvenanceTableConfig);
+
+        // Get the element ID for this item type
+        var elementId = null;
+        if (itemTypeId !== 'fallback' && ProvenanceTableConfig[itemTypeId]) {
+            elementId = ProvenanceTableConfig[itemTypeId];
+        }
+
+        if (!elementId) {
+            console.log('No element configured for this item type');
+            return;
+        }
+
+        console.log('Element ID to transform:', elementId);
+
+        // Find the field by element ID
+        var $provenanceField = findProvenanceFieldByElementId(elementId);
 
         if (!$provenanceField || $provenanceField.length === 0) {
-            console.log('Provenance field not found');
+            console.log('Provenance field not found for element ID:', elementId);
             return;
         }
 
@@ -52,34 +82,52 @@
     }
 
     /**
-     * Find the Provenance field textarea
+     * Get current item type ID from the page
      */
-    function findProvenanceField() {
-        // Try multiple selectors to find the Provenance field
+    function getCurrentItemTypeId() {
+        // Try to get from the item type select dropdown
+        var $itemTypeSelect = $('#item_type_id, select[name="item_type_id"]');
+        if ($itemTypeSelect.length > 0 && $itemTypeSelect.val()) {
+            return $itemTypeSelect.val();
+        }
+
+        // Try to get from a hidden field (if editing)
+        var $hiddenItemType = $('input[name="item_type_id"]');
+        if ($hiddenItemType.length > 0 && $hiddenItemType.val()) {
+            return $hiddenItemType.val();
+        }
+
+        // Try to get from body class (Omeka sometimes adds this)
+        var bodyClass = $('body').attr('class');
+        if (bodyClass) {
+            var match = bodyClass.match(/item-type-(\d+)/);
+            if (match) {
+                return match[1];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Find the provenance field textarea by element ID
+     */
+    function findProvenanceFieldByElementId(elementId) {
+        // In Omeka, element fields have IDs like: Elements-{element_id}-0-text
+        // Try multiple patterns
         var selectors = [
-            'textarea[name*="Provenance"]',
-            'textarea[id*="provenance"]',
-            'textarea[id*="Provenance"]',
-            '.field:has(label:contains("Provenance")) textarea',
-            '#item-type-metadata textarea[name*="Provenance"]'
+            '#Elements-' + elementId + '-0-text',
+            'textarea[id^="Elements-' + elementId + '-"]',
+            'textarea[name^="Elements[' + elementId + ']"]',
+            'textarea[id*="Elements-' + elementId + '"]'
         ];
 
         for (var i = 0; i < selectors.length; i++) {
             var $field = $(selectors[i]);
             if ($field.length > 0) {
+                console.log('Found field using selector:', selectors[i]);
                 return $field.first();
             }
-        }
-
-        // Fallback: look for any label with "Provenance" and find its associated textarea
-        var $label = $('label:contains("Provenance")');
-        if ($label.length > 0) {
-            var forAttr = $label.attr('for');
-            if (forAttr) {
-                return $('#' + forAttr);
-            }
-            // Try to find textarea in same container
-            return $label.closest('.field').find('textarea').first();
         }
 
         return null;

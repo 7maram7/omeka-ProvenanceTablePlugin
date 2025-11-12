@@ -17,10 +17,53 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
      * @var array Plugin hooks
      */
     protected $_hooks = array(
+        'install',
+        'uninstall',
+        'config_form',
+        'config',
         'admin_head',
         'public_head',
         'public_items_show',
     );
+
+    /**
+     * Install the plugin.
+     */
+    public function hookInstall()
+    {
+        // Set default options (empty - user must configure)
+        set_option('provenance_table_mappings', serialize(array()));
+    }
+
+    /**
+     * Uninstall the plugin.
+     */
+    public function hookUninstall()
+    {
+        // Delete plugin options
+        delete_option('provenance_table_mappings');
+    }
+
+    /**
+     * Display the plugin configuration form.
+     */
+    public function hookConfigForm()
+    {
+        include 'config_form.php';
+    }
+
+    /**
+     * Handle the plugin configuration form submission.
+     */
+    public function hookConfig($args)
+    {
+        $post = $args['post'];
+
+        // Save the mappings
+        if (isset($post['provenance_mappings']) && is_array($post['provenance_mappings'])) {
+            set_option('provenance_table_mappings', serialize($post['provenance_mappings']));
+        }
+    }
 
     /**
      * Add CSS and JavaScript to admin head.
@@ -36,6 +79,17 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         if ($module == 'default' && $controller == 'items' && ($action == 'add' || $action == 'edit')) {
             queue_css_file('provenance-table');
             queue_js_file('provenance-table');
+
+            // Get the mappings
+            $mappings = unserialize(get_option('provenance_table_mappings'));
+            if (!is_array($mappings)) {
+                $mappings = array();
+            }
+
+            // Pass configuration to JavaScript
+            echo '<script type="text/javascript">';
+            echo 'var ProvenanceTableConfig = ' . json_encode($mappings) . ';';
+            echo '</script>';
         }
     }
 
