@@ -71,7 +71,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             // Display as regular text (old format)
             echo '<div id="provenance-section" class="element">';
             echo '<h3>Provenance</h3>';
-            echo '<div class="element-text">' . $provenanceText . '</div>';
+            echo '<div class="element-text">' . html_escape($provenanceText) . '</div>';
             echo '</div>';
         }
     }
