@@ -18,6 +18,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
      */
     protected $_hooks = array(
         'admin_head',
+        'public_head',
         'public_items_show',
     );
 
@@ -36,6 +37,14 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             queue_css_file('provenance-table');
             queue_js_file('provenance-table');
         }
+    }
+
+    /**
+     * Add CSS to public head.
+     */
+    public function hookPublicHead($args)
+    {
+        queue_css_file('provenance-display');
     }
 
     /**
@@ -89,9 +98,9 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         foreach ($data as $index => $row) {
             echo '<tr>';
             echo '<td>' . html_escape($index + 1) . '</td>';
-            echo '<td>' . html_escape($row['auction']) . '</td>';
-            echo '<td>' . html_escape($row['date']) . '</td>';
-            echo '<td>' . html_escape($row['characteristics']) . '</td>';
+            echo '<td>' . html_escape(isset($row['auction']) ? $row['auction'] : '') . '</td>';
+            echo '<td>' . html_escape(isset($row['date']) ? $row['date'] : '') . '</td>';
+            echo '<td>' . html_escape(isset($row['characteristics']) ? $row['characteristics'] : '') . '</td>';
             echo '</tr>';
         }
 
