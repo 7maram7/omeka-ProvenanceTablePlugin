@@ -25,6 +25,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         'admin_items_show_tabs',
         'admin_items_panel_fields',
         'before_save_item',
+        'after_save_item',
         'admin_head',
         'public_head',
         'public_items_show',
@@ -135,13 +136,16 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         }
 
         // Save enabled item types
-        if (isset($post['provenance_enabled_item_types'])) {
-            if ($post['provenance_enabled_item_types'] === 'all') {
-                set_option('provenance_enabled_item_types', 'all');
-            } else if (is_array($post['provenance_enabled_item_types'])) {
+        if (isset($post['provenance_enable_mode']) && $post['provenance_enable_mode'] === 'specific') {
+            // Save specific item types if any are selected
+            if (isset($post['provenance_enabled_item_types']) && is_array($post['provenance_enabled_item_types'])) {
                 set_option('provenance_enabled_item_types', serialize($post['provenance_enabled_item_types']));
+            } else {
+                // No types selected, default to all
+                set_option('provenance_enabled_item_types', 'all');
             }
         } else {
+            // Mode is 'all' or not set
             set_option('provenance_enabled_item_types', 'all');
         }
     }
@@ -198,7 +202,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
     }
 
     /**
-     * Save provenance data when item is saved.
+     * Store provenance data before item is saved.
      */
     public function hookBeforeSaveItem($args)
     {
@@ -215,6 +219,27 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             'item_id' => $item->id,
             'data' => $post['provenance_data']
         ));
+    }
+
+    /**
+     * Save provenance data after item is saved.
+     * This runs after the item has an ID.
+     */
+    public function hookAfterSaveItem($args)
+    {
+        $item = $args['record'];
+
+        // Check if we have provenance data to save
+        if (Zend_Registry::isRegistered('provenance_data_to_save')) {
+            $saveData = Zend_Registry::get('provenance_data_to_save');
+
+            if ($item->id) {
+                self::saveProvenanceData($item->id, $saveData['data']);
+            }
+
+            // Clear the registry
+            Zend_Registry::set('provenance_data_to_save', null);
+        }
     }
 
     /**
@@ -349,27 +374,3 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         }
     }
 }
-
-/**
- * Hook to save provenance data after item is saved.
- * This needs to be a separate function because we need the item ID.
- */
-function provenance_table_after_save_item($args)
-{
-    $item = $args['record'];
-
-    // Check if we have provenance data to save
-    if (Zend_Registry::isRegistered('provenance_data_to_save')) {
-        $saveData = Zend_Registry::get('provenance_data_to_save');
-
-        if ($item->id) {
-            ProvenanceTablePlugin::saveProvenanceData($item->id, $saveData['data']);
-        }
-
-        // Clear the registry
-        Zend_Registry::set('provenance_data_to_save', null);
-    }
-}
-
-// Register the after_save_item hook
-add_plugin_hook('after_save_item', 'provenance_table_after_save_item');

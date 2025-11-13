@@ -96,13 +96,14 @@ $itemTypes = get_db()->getTable('ItemType')->findAll();
         </div>
         <div class="inputs five columns omega">
             <label>
-                <input type="radio" name="provenance_enabled_item_types" value="all"
-                       <?php echo ($enabledItemTypes === 'all') ? 'checked' : ''; ?> />
+                <input type="radio" name="provenance_enable_mode" value="all"
+                       <?php echo ($enabledItemTypes === 'all') ? 'checked' : ''; ?>
+                       onclick="document.getElementById('specific-types-container').style.display='none';" />
                 Enable for ALL item types
             </label>
             <br/><br/>
             <label>
-                <input type="radio" name="provenance_enabled_item_types_selector" value="specific"
+                <input type="radio" name="provenance_enable_mode" value="specific"
                        <?php echo ($enabledItemTypes !== 'all') ? 'checked' : ''; ?>
                        onclick="document.getElementById('specific-types-container').style.display='block';" />
                 Enable only for specific item types:
@@ -135,18 +136,3 @@ $itemTypes = get_db()->getTable('ItemType')->findAll();
     </div>
 </fieldset>
 
-<script type="text/javascript">
-jQuery(document).ready(function($) {
-    $('input[name="provenance_enabled_item_types"]').on('change', function() {
-        if ($(this).val() === 'all') {
-            $('#specific-types-container').hide();
-        }
-    });
-
-    $('input[name="provenance_enabled_item_types_selector"]').on('change', function() {
-        if ($(this).val() === 'specific') {
-            $('#specific-types-container').show();
-        }
-    });
-});
-</script>
