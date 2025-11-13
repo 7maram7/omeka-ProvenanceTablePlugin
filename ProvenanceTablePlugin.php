@@ -19,8 +19,12 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
     protected $_hooks = array(
         'install',
         'uninstall',
+        'upgrade',
         'config_form',
         'config',
+        'admin_items_show_tabs',
+        'admin_items_panel_fields',
+        'before_save_item',
         'admin_head',
         'public_head',
         'public_items_show',
@@ -31,8 +35,32 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
      */
     public function hookInstall()
     {
-        // Set default options (empty - user must configure)
-        set_option('provenance_table_mappings', serialize(array()));
+        $db = $this->_db;
+
+        // Create provenance table
+        $sql = "
+        CREATE TABLE IF NOT EXISTS `{$db->prefix}provenance_data` (
+            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+            `item_id` int(10) unsigned NOT NULL,
+            `row_order` int(10) unsigned NOT NULL DEFAULT '0',
+            `col1` text COLLATE utf8_unicode_ci,
+            `col2` text COLLATE utf8_unicode_ci,
+            `col3` text COLLATE utf8_unicode_ci,
+            `col4` text COLLATE utf8_unicode_ci,
+            PRIMARY KEY (`id`),
+            KEY `item_id` (`item_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+        ";
+        $db->query($sql);
+
+        // Set default configuration options
+        set_option('provenance_tab_name', 'Provenance');
+        set_option('provenance_num_columns', '4');
+        set_option('provenance_col1_name', 'No.');
+        set_option('provenance_col2_name', 'Auction/Collection');
+        set_option('provenance_col3_name', 'Date');
+        set_option('provenance_col4_name', 'Characteristics');
+        set_option('provenance_enabled_item_types', 'all'); // 'all' or serialized array of IDs
     }
 
     /**
@@ -40,8 +68,35 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
      */
     public function hookUninstall()
     {
+        $db = $this->_db;
+
+        // Drop provenance table
+        $sql = "DROP TABLE IF EXISTS `{$db->prefix}provenance_data`";
+        $db->query($sql);
+
         // Delete plugin options
-        delete_option('provenance_table_mappings');
+        delete_option('provenance_tab_name');
+        delete_option('provenance_num_columns');
+        delete_option('provenance_col1_name');
+        delete_option('provenance_col2_name');
+        delete_option('provenance_col3_name');
+        delete_option('provenance_col4_name');
+        delete_option('provenance_enabled_item_types');
+    }
+
+    /**
+     * Upgrade the plugin.
+     */
+    public function hookUpgrade($args)
+    {
+        $oldVersion = $args['old_version'];
+        $newVersion = $args['new_version'];
+
+        // Handle upgrades from old version (field transformation) to new version (tabs)
+        if (version_compare($oldVersion, '3.0.0', '<')) {
+            // Remove old options
+            delete_option('provenance_table_mappings');
+        }
     }
 
     /**
@@ -59,10 +114,107 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
     {
         $post = $args['post'];
 
-        // Save the mappings
-        if (isset($post['provenance_mappings']) && is_array($post['provenance_mappings'])) {
-            set_option('provenance_table_mappings', serialize($post['provenance_mappings']));
+        // Save tab name
+        if (isset($post['provenance_tab_name'])) {
+            set_option('provenance_tab_name', trim($post['provenance_tab_name']));
         }
+
+        // Save number of columns (2-4)
+        if (isset($post['provenance_num_columns'])) {
+            $numCols = (int)$post['provenance_num_columns'];
+            if ($numCols < 2) $numCols = 2;
+            if ($numCols > 4) $numCols = 4;
+            set_option('provenance_num_columns', $numCols);
+        }
+
+        // Save column names
+        for ($i = 1; $i <= 4; $i++) {
+            if (isset($post['provenance_col' . $i . '_name'])) {
+                set_option('provenance_col' . $i . '_name', trim($post['provenance_col' . $i . '_name']));
+            }
+        }
+
+        // Save enabled item types
+        if (isset($post['provenance_enabled_item_types'])) {
+            if ($post['provenance_enabled_item_types'] === 'all') {
+                set_option('provenance_enabled_item_types', 'all');
+            } else if (is_array($post['provenance_enabled_item_types'])) {
+                set_option('provenance_enabled_item_types', serialize($post['provenance_enabled_item_types']));
+            }
+        } else {
+            set_option('provenance_enabled_item_types', 'all');
+        }
+    }
+
+    /**
+     * Add the Provenance tab to the admin items form.
+     */
+    public function hookAdminItemsShowTabs($args)
+    {
+        $item = $args['item'];
+
+        // Check if enabled for this item type
+        if (!$this->_isEnabledForItem($item)) {
+            return;
+        }
+
+        $tabName = get_option('provenance_tab_name') ?: 'Provenance';
+        $tabs = array('Provenance' => $tabName);
+
+        return $tabs;
+    }
+
+    /**
+     * Add content to the Provenance tab panel.
+     */
+    public function hookAdminItemsPanelFields($args)
+    {
+        $item = $args['item'];
+        $view = $args['view'];
+
+        // Check if enabled for this item type
+        if (!$this->_isEnabledForItem($item)) {
+            return;
+        }
+
+        // Only show on Provenance tab
+        $currentTab = isset($_GET['tab']) ? $_GET['tab'] : '';
+        if ($currentTab !== 'Provenance') {
+            return;
+        }
+
+        // Get existing provenance data for this item
+        $provenanceData = $this->_getProvenanceData($item);
+
+        // Get column configuration
+        $numColumns = (int)get_option('provenance_num_columns') ?: 4;
+        $columnNames = array();
+        for ($i = 1; $i <= $numColumns; $i++) {
+            $columnNames[$i] = get_option('provenance_col' . $i . '_name') ?: 'Column ' . $i;
+        }
+
+        // Render the provenance table form
+        include 'views/admin/items/provenance-panel.php';
+    }
+
+    /**
+     * Save provenance data when item is saved.
+     */
+    public function hookBeforeSaveItem($args)
+    {
+        $item = $args['record'];
+        $post = $args['post'];
+
+        // Check if provenance data was submitted
+        if (!isset($post['provenance_data'])) {
+            return;
+        }
+
+        // Store in request registry to save after item is saved
+        Zend_Registry::set('provenance_data_to_save', array(
+            'item_id' => $item->id,
+            'data' => $post['provenance_data']
+        ));
     }
 
     /**
@@ -71,25 +223,13 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
     public function hookAdminHead($args)
     {
         $request = Zend_Controller_Front::getInstance()->getRequest();
-        $module = $request->getModuleName();
         $controller = $request->getControllerName();
         $action = $request->getActionName();
 
         // Only load on items add/edit pages
-        if ($module == 'default' && $controller == 'items' && ($action == 'add' || $action == 'edit')) {
+        if ($controller == 'items' && ($action == 'add' || $action == 'edit' || $action == 'show')) {
             queue_css_file('provenance-table');
             queue_js_file('provenance-table');
-
-            // Get the mappings
-            $mappings = unserialize(get_option('provenance_table_mappings'));
-            if (!is_array($mappings)) {
-                $mappings = array();
-            }
-
-            // Pass configuration to JavaScript
-            echo '<script type="text/javascript">';
-            echo 'var ProvenanceTableConfig = ' . json_encode($mappings) . ';';
-            echo '</script>';
         }
     }
 
@@ -108,59 +248,128 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
     {
         $item = $args['item'];
 
-        // Try to get provenance data
-        $provenanceText = metadata($item, array('Item Type Metadata', 'Provenance'), array('no_escape' => true));
-
-        if (empty($provenanceText)) {
+        // Check if enabled for this item type
+        if (!$this->_isEnabledForItem($item)) {
             return;
         }
 
-        // Try to parse as JSON (structured data from our table)
-        $provenanceData = json_decode($provenanceText, true);
+        // Get provenance data
+        $provenanceData = $this->_getProvenanceData($item);
 
-        if (json_last_error() === JSON_ERROR_NONE && is_array($provenanceData) && !empty($provenanceData)) {
-            // Display as table
-            $this->_displayProvenanceTable($provenanceData);
-        } else {
-            // Display as regular text (old format)
-            echo '<div id="provenance-section" class="element">';
-            echo '<h3>Provenance</h3>';
-            echo '<div class="element-text">' . html_escape($provenanceText) . '</div>';
-            echo '</div>';
+        if (empty($provenanceData)) {
+            return;
         }
+
+        // Get column configuration
+        $numColumns = (int)get_option('provenance_num_columns') ?: 4;
+        $columnNames = array();
+        for ($i = 1; $i <= $numColumns; $i++) {
+            $columnNames[$i] = get_option('provenance_col' . $i . '_name') ?: 'Column ' . $i;
+        }
+
+        $tabName = get_option('provenance_tab_name') ?: 'Provenance';
+
+        // Display the table
+        include 'views/public/items/provenance-display.php';
     }
 
     /**
-     * Display provenance data as a formatted table.
-     *
-     * @param array $data
+     * Check if provenance is enabled for this item's type.
      */
-    protected function _displayProvenanceTable($data)
+    protected function _isEnabledForItem($item)
     {
-        echo '<div id="provenance-section" class="element">';
-        echo '<h3>Provenance</h3>';
-        echo '<div class="element-text">';
-        echo '<table class="provenance-display-table">';
-        echo '<thead><tr>';
-        echo '<th>No.</th>';
-        echo '<th>Auction or Collection</th>';
-        echo '<th>Date</th>';
-        echo '<th>Characteristics</th>';
-        echo '</tr></thead>';
-        echo '<tbody>';
+        $enabledSetting = get_option('provenance_enabled_item_types');
 
-        foreach ($data as $index => $row) {
-            echo '<tr>';
-            echo '<td>' . html_escape($index + 1) . '</td>';
-            echo '<td>' . html_escape(isset($row['auction']) ? $row['auction'] : '') . '</td>';
-            echo '<td>' . html_escape(isset($row['date']) ? $row['date'] : '') . '</td>';
-            echo '<td>' . html_escape(isset($row['characteristics']) ? $row['characteristics'] : '') . '</td>';
-            echo '</tr>';
+        if ($enabledSetting === 'all') {
+            return true;
         }
 
-        echo '</tbody>';
-        echo '</table>';
-        echo '</div>';
-        echo '</div>';
+        // Check if item has a type and if it's in the enabled list
+        if ($item && $item->item_type_id) {
+            $enabledTypes = @unserialize($enabledSetting);
+            if (is_array($enabledTypes)) {
+                return in_array($item->item_type_id, $enabledTypes);
+            }
+        }
+
+        return true; // Default to enabled
+    }
+
+    /**
+     * Get provenance data for an item.
+     */
+    protected function _getProvenanceData($item)
+    {
+        if (!$item || !$item->id) {
+            return array();
+        }
+
+        $db = $this->_db;
+        $sql = "SELECT * FROM {$db->prefix}provenance_data
+                WHERE item_id = ?
+                ORDER BY row_order ASC";
+
+        return $db->fetchAll($sql, array($item->id));
+    }
+
+    /**
+     * Save provenance data for an item.
+     */
+    public static function saveProvenanceData($itemId, $data)
+    {
+        $db = get_db();
+
+        // Delete existing data
+        $db->query("DELETE FROM {$db->prefix}provenance_data WHERE item_id = ?", array($itemId));
+
+        // Insert new data
+        if (is_array($data) && !empty($data)) {
+            $order = 0;
+            foreach ($data as $row) {
+                // Check if row has any data
+                $hasData = false;
+                for ($i = 1; $i <= 4; $i++) {
+                    if (!empty($row['col' . $i])) {
+                        $hasData = true;
+                        break;
+                    }
+                }
+
+                if ($hasData) {
+                    $db->insert('provenance_data', array(
+                        'item_id' => $itemId,
+                        'row_order' => $order++,
+                        'col1' => isset($row['col1']) ? $row['col1'] : '',
+                        'col2' => isset($row['col2']) ? $row['col2'] : '',
+                        'col3' => isset($row['col3']) ? $row['col3'] : '',
+                        'col4' => isset($row['col4']) ? $row['col4'] : '',
+                    ));
+                }
+            }
+        }
     }
 }
+
+/**
+ * Hook to save provenance data after item is saved.
+ * This needs to be a separate function because we need the item ID.
+ */
+function provenance_table_after_save_item($args)
+{
+    $item = $args['record'];
+
+    // Check if we have provenance data to save
+    if (Zend_Registry::isRegistered('provenance_data_to_save')) {
+        $saveData = Zend_Registry::get('provenance_data_to_save');
+
+        if ($item->id) {
+            ProvenanceTablePlugin::saveProvenanceData($item->id, $saveData['data']);
+        }
+
+        // Clear the registry
+        Zend_Registry::set('provenance_data_to_save', null);
+    }
+}
+
+// Register the after_save_item hook
+add_plugin_hook('after_save_item', 'provenance_table_after_save_item');
