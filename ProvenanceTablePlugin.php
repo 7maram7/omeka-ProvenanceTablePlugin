@@ -16,7 +16,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
     /**
      * @var array Plugin hooks
      */
-    protected $_hooks = array(
+    public $_hooks = array(
         'install',
         'uninstall',
         'config_form',
