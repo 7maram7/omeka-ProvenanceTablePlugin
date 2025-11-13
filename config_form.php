@@ -42,8 +42,8 @@ $itemTypes = get_db()->getTable('ItemType')->findAll();
                                 <select name="provenance_mappings[<?php echo $itemType->id; ?>]" class="textinput">
                                     <option value="">-- None (Disabled) --</option>
                                     <?php
-                                    // Get all elements for this item type
-                                    $elements = $itemType->getElements();
+                                    // Get all elements for this item type using the correct Omeka API
+                                    $elements = get_db()->getTable('Element')->findByItemType($itemType->id);
                                     foreach ($elements as $element):
                                         $selected = (isset($mappings[$itemType->id]) && $mappings[$itemType->id] == $element->id) ? 'selected' : '';
                                     ?>
