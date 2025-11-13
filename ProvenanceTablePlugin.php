@@ -22,13 +22,18 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         'upgrade',
         'config_form',
         'config',
-        'admin_items_show_tabs',
-        'admin_items_panel_fields',
         'before_save_item',
         'after_save_item',
         'admin_head',
         'public_head',
         'public_items_show',
+    );
+
+    /**
+     * @var array Plugin filters
+     */
+    protected $_filters = array(
+        'admin_items_form_tabs',
     );
 
     /**
@@ -152,40 +157,18 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
 
     /**
      * Add the Provenance tab to the admin items form.
+     * This is a FILTER, not a hook.
      */
-    public function hookAdminItemsShowTabs($args)
+    public function filterAdminItemsFormTabs($tabs, $args)
     {
         $item = $args['item'];
 
         // Check if enabled for this item type
         if (!$this->_isEnabledForItem($item)) {
-            return;
+            return $tabs;
         }
 
         $tabName = get_option('provenance_tab_name') ?: 'Provenance';
-        $tabs = array('Provenance' => $tabName);
-
-        return $tabs;
-    }
-
-    /**
-     * Add content to the Provenance tab panel.
-     */
-    public function hookAdminItemsPanelFields($args)
-    {
-        $item = $args['item'];
-        $view = $args['view'];
-
-        // Check if enabled for this item type
-        if (!$this->_isEnabledForItem($item)) {
-            return;
-        }
-
-        // Only show on Provenance tab
-        $currentTab = isset($_GET['tab']) ? $_GET['tab'] : '';
-        if ($currentTab !== 'Provenance') {
-            return;
-        }
 
         // Get existing provenance data for this item
         $provenanceData = $this->_getProvenanceData($item);
@@ -197,8 +180,15 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             $columnNames[$i] = get_option('provenance_col' . $i . '_name') ?: 'Column ' . $i;
         }
 
-        // Render the provenance table form
+        // Generate the HTML content for the tab
+        ob_start();
         include 'views/admin/items/provenance-panel.php';
+        $tabContent = ob_get_clean();
+
+        // Add the tab to the tabs array
+        $tabs[$tabName] = $tabContent;
+
+        return $tabs;
     }
 
     /**
