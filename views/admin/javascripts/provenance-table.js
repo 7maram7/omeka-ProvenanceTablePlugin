@@ -41,19 +41,23 @@
         // Get number of columns from config
         var numColumns = (typeof ProvenanceTableConfig !== 'undefined') ? ProvenanceTableConfig.numColumns : 4;
 
+        // Get the next row index
+        var rowCount = $tbody.find('tr').length;
+        var rowIndex = rowCount;
+
         // Create new row
         var $newRow = $('<tr></tr>');
 
-        // Add input fields for each column
+        // Add input fields for each column with explicit row index
         for (var i = 1; i <= numColumns; i++) {
             var $td = $('<td></td>');
-            var $input = $('<input type="text" class="textinput provenance-col" name="provenance_data[][col' + i + ']" value="" />');
+            var $input = $('<input type="text" class="textinput provenance-col" name="provenance_data[' + rowIndex + '][col' + i + ']" value="" />');
             $td.append($input);
             $newRow.append($td);
         }
 
         // Add delete button
-        var $actionTd = $('<td></td>');
+        var $actionTd = $('<td style="text-align: center;"></td>');
         var $deleteBtn = $('<button type="button" class="button delete-provenance-row">Delete</button>');
         $actionTd.append($deleteBtn);
         $newRow.append($actionTd);
@@ -79,7 +83,23 @@
 
         if (confirm('Are you sure you want to delete this row?')) {
             $button.closest('tr').remove();
+            // Re-index all rows after deletion
+            reindexRows();
         }
+    }
+
+    /**
+     * Re-index row numbers in form field names after add/delete
+     */
+    function reindexRows() {
+        $('#provenance-table-body tr').each(function(index) {
+            $(this).find('input.provenance-col').each(function() {
+                var name = $(this).attr('name');
+                // Replace the row index (first number in brackets)
+                var newName = name.replace(/\[\d+\]/, '[' + index + ']');
+                $(this).attr('name', newName);
+            });
+        });
     }
 
 })(jQuery);

@@ -16,13 +16,13 @@
     </thead>
     <tbody id="provenance-table-body">
         <?php if (!empty($provenanceData)): ?>
-            <?php foreach ($provenanceData as $row): ?>
+            <?php foreach ($provenanceData as $rowIndex => $row): ?>
                 <tr>
                     <?php for ($i = 1; $i <= $numColumns; $i++): ?>
                         <td>
                             <input type="text"
                                    class="textinput provenance-col"
-                                   name="provenance_data[][col<?php echo $i; ?>]"
+                                   name="provenance_data[<?php echo $rowIndex; ?>][col<?php echo $i; ?>]"
                                    value="<?php echo html_escape($row['col' . $i]); ?>" />
                         </td>
                     <?php endfor; ?>
@@ -37,7 +37,7 @@
                     <td>
                         <input type="text"
                                class="textinput provenance-col"
-                               name="provenance_data[][col<?php echo $i; ?>]"
+                               name="provenance_data[0][col<?php echo $i; ?>]"
                                value="" />
                     </td>
                 <?php endfor; ?>
