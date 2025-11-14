@@ -1,124 +1,49 @@
 /**
  * Provenance Table Plugin - Admin CSS
- * Styles for the provenance table interface
+ * Simple, clean styling that matches Omeka's default admin interface
  */
 
-/* Container */
-.provenance-table-container {
-    margin: 10px 0;
-    padding: 15px;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-/* Table Styles */
+/* Table Styles - Simple and clean */
 .provenance-table {
     width: 100%;
     border-collapse: collapse;
-    background: #fff;
-    margin-bottom: 15px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin: 10px 0;
 }
 
 .provenance-table thead th {
-    background: #2582a0;
-    color: #fff;
-    padding: 10px 8px;
+    background: #f0f0f0;
+    padding: 8px;
     text-align: left;
-    font-weight: 600;
-    font-size: 13px;
-    border-right: 1px solid #fff;
-}
-
-.provenance-table thead th:last-child {
-    border-right: none;
-}
-
-.provenance-table tbody tr {
-    border-bottom: 1px solid #e0e0e0;
-}
-
-.provenance-table tbody tr:hover {
-    background-color: #f5f5f5;
+    font-weight: normal;
+    border: 1px solid #ccc;
+    font-size: 12px;
 }
 
 .provenance-table tbody td {
-    padding: 8px;
-    vertical-align: middle;
+    padding: 5px;
+    border: 1px solid #ddd;
 }
 
-/* Row Number */
-.provenance-table .row-number {
-    text-align: center;
-    font-weight: 600;
-    width: 50px;
-    background: #f0f0f0;
-}
-
-/* Input Fields */
+/* Input Fields - Match Omeka defaults */
 .provenance-table input[type="text"] {
     width: 100%;
-    padding: 6px 8px;
+    padding: 5px;
     border: 1px solid #ccc;
-    border-radius: 3px;
-    font-size: 13px;
+    font-size: 12px;
     box-sizing: border-box;
 }
 
 .provenance-table input[type="text"]:focus {
-    border-color: #2582a0;
+    border-color: #5b9dd9;
     outline: none;
-    box-shadow: 0 0 0 2px rgba(37, 130, 160, 0.1);
 }
 
-/* Buttons */
+/* Buttons - Match Omeka button style */
 .add-provenance-row {
-    background: #5cb85c;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: background-color 0.2s;
-}
-
-.add-provenance-row:hover {
-    background: #4cae4c;
+    margin-top: 10px;
 }
 
 .delete-provenance-row {
-    background: #d9534f;
-    color: #fff;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.2s;
-}
-
-.delete-provenance-row:hover {
-    background: #c9302c;
-}
-
-/* Column Widths */
-.provenance-table td:nth-child(1) { width: 50px; }  /* No. */
-.provenance-table td:nth-child(2) { width: 30%; }   /* Auction/Collection */
-.provenance-table td:nth-child(3) { width: 15%; }   /* Date */
-.provenance-table td:nth-child(4) { width: 40%; }   /* Characteristics */
-.provenance-table td:nth-child(5) { width: 100px; } /* Actions */
-
-/* Responsive */
-@media screen and (max-width: 1200px) {
-    .provenance-table {
-        font-size: 12px;
-    }
-
-    .provenance-table input[type="text"] {
-        font-size: 12px;
-        padding: 5px 6px;
-    }
+    font-size: 11px;
+    padding: 3px 8px;
 }

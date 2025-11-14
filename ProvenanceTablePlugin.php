@@ -351,13 +351,17 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
                 }
 
                 if ($hasData) {
-                    $db->insert('provenance_data', array(
-                        'item_id' => $itemId,
-                        'row_order' => $order++,
-                        'col1' => isset($row['col1']) ? $row['col1'] : '',
-                        'col2' => isset($row['col2']) ? $row['col2'] : '',
-                        'col3' => isset($row['col3']) ? $row['col3'] : '',
-                        'col4' => isset($row['col4']) ? $row['col4'] : '',
+                    // Use direct SQL to avoid Zend's table name pluralization
+                    $sql = "INSERT INTO {$db->prefix}provenance_data
+                            (item_id, row_order, col1, col2, col3, col4)
+                            VALUES (?, ?, ?, ?, ?, ?)";
+                    $db->query($sql, array(
+                        $itemId,
+                        $order++,
+                        isset($row['col1']) ? $row['col1'] : '',
+                        isset($row['col2']) ? $row['col2'] : '',
+                        isset($row['col3']) ? $row['col3'] : '',
+                        isset($row['col4']) ? $row['col4'] : ''
                     ));
                 }
             }

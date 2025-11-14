@@ -1,97 +1,27 @@
 /**
  * Provenance Table Plugin - Public CSS
- * Styles for public display of provenance table
+ * Simple, clean styling for public display
  */
 
-/* Display Table */
 .provenance-display-table {
     width: 100%;
     border-collapse: collapse;
     margin: 15px 0;
-    background: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.provenance-display-table thead {
-    background: #2582a0;
-    color: #fff;
 }
 
 .provenance-display-table thead th {
-    padding: 12px 10px;
+    background: #f5f5f5;
+    padding: 10px;
     text-align: left;
-    font-weight: 600;
-    font-size: 14px;
-    border-right: 1px solid rgba(255,255,255,0.2);
-}
-
-.provenance-display-table thead th:last-child {
-    border-right: none;
-}
-
-.provenance-display-table tbody tr {
-    border-bottom: 1px solid #e0e0e0;
-    transition: background-color 0.2s;
-}
-
-.provenance-display-table tbody tr:hover {
-    background-color: #f8f9fa;
-}
-
-.provenance-display-table tbody tr:last-child {
-    border-bottom: none;
+    border: 1px solid #ddd;
+    font-weight: normal;
 }
 
 .provenance-display-table tbody td {
-    padding: 12px 10px;
-    font-size: 14px;
-    color: #333;
-    vertical-align: top;
+    padding: 10px;
+    border: 1px solid #ddd;
 }
 
-.provenance-display-table tbody td:first-child {
-    font-weight: 600;
-    text-align: center;
-    background: #f8f9fa;
-}
-
-/* Responsive design */
-@media screen and (max-width: 768px) {
-    .provenance-display-table {
-        font-size: 12px;
-    }
-
-    .provenance-display-table thead th,
-    .provenance-display-table tbody td {
-        padding: 8px 6px;
-        font-size: 12px;
-    }
-}
-
-/* Make table scrollable on small screens */
-@media screen and (max-width: 600px) {
-    #provenance-section {
-        overflow-x: auto;
-    }
-
-    .provenance-display-table {
-        min-width: 600px;
-    }
-}
-
-/* Print styles */
-@media print {
-    .provenance-display-table {
-        border: 1px solid #000;
-    }
-
-    .provenance-display-table thead {
-        background: #ccc;
-        color: #000;
-    }
-
-    .provenance-display-table thead th,
-    .provenance-display-table tbody td {
-        border: 1px solid #999;
-    }
+.provenance-display-table tbody tr:nth-child(even) {
+    background-color: #fafafa;
 }
