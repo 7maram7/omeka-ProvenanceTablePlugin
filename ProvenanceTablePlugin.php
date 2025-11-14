@@ -182,7 +182,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
 
         // Generate the HTML content for the tab
         ob_start();
-        include 'views/admin/items/provenance-panel.php';
+        include dirname(__FILE__) . '/views/admin/items/provenance-panel.php';
         $tabContent = ob_get_clean();
 
         // Add the tab to the tabs array
@@ -341,10 +341,11 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         if (is_array($data) && !empty($data)) {
             $order = 0;
             foreach ($data as $row) {
-                // Check if row has any data
+                // Check if row has any non-empty data
                 $hasData = false;
                 for ($i = 1; $i <= 4; $i++) {
-                    if (!empty($row['col' . $i])) {
+                    $value = isset($row['col' . $i]) ? trim($row['col' . $i]) : '';
+                    if ($value !== '') {
                         $hasData = true;
                         break;
                     }
@@ -358,10 +359,10 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
                     $db->query($sql, array(
                         $itemId,
                         $order++,
-                        isset($row['col1']) ? $row['col1'] : '',
-                        isset($row['col2']) ? $row['col2'] : '',
-                        isset($row['col3']) ? $row['col3'] : '',
-                        isset($row['col4']) ? $row['col4'] : ''
+                        isset($row['col1']) ? trim($row['col1']) : '',
+                        isset($row['col2']) ? trim($row['col2']) : '',
+                        isset($row['col3']) ? trim($row['col3']) : '',
+                        isset($row['col4']) ? trim($row['col4']) : ''
                     ));
                 }
             }

@@ -18,6 +18,17 @@
             </thead>
             <tbody>
                 <?php foreach ($provenanceData as $row): ?>
+                    <?php
+                    // Skip completely empty rows
+                    $hasContent = false;
+                    for ($i = 1; $i <= $numColumns; $i++) {
+                        if (!empty(trim($row['col' . $i]))) {
+                            $hasContent = true;
+                            break;
+                        }
+                    }
+                    if (!$hasContent) continue;
+                    ?>
                     <tr>
                         <?php for ($i = 1; $i <= $numColumns; $i++): ?>
                             <td><?php echo html_escape($row['col' . $i]); ?></td>
