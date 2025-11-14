@@ -25,6 +25,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         'before_save_item',
         'after_save_item',
         'admin_head',
+        'admin_items_show',
         'public_head',
         'public_items_show',
     );
@@ -246,6 +247,38 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             queue_css_file('provenance-table');
             queue_js_file('provenance-table');
         }
+    }
+
+    /**
+     * Display provenance table on admin items show page.
+     */
+    public function hookAdminItemsShow($args)
+    {
+        $item = $args['item'];
+
+        // Check if enabled for this item type
+        if (!$this->_isEnabledForItem($item)) {
+            return;
+        }
+
+        // Get provenance data
+        $provenanceData = $this->_getProvenanceData($item);
+
+        if (empty($provenanceData)) {
+            return;
+        }
+
+        // Get column configuration
+        $numColumns = (int)get_option('provenance_num_columns') ?: 4;
+        $columnNames = array();
+        for ($i = 1; $i <= $numColumns; $i++) {
+            $columnNames[$i] = get_option('provenance_col' . $i . '_name') ?: 'Column ' . $i;
+        }
+
+        $tabName = get_option('provenance_tab_name') ?: 'Provenance';
+
+        // Display the table
+        include dirname(__FILE__) . '/views/admin/items/provenance-show.php';
     }
 
     /**
