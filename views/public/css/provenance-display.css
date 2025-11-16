@@ -18,10 +18,7 @@
 }
 
 .provenance-display-table tbody td {
-    padding: 10px;
+    padding: 5px 10px;
     border: 1px solid #ddd;
-}
-
-.provenance-display-table tbody tr:nth-child(even) {
-    background-color: #fafafa;
+    background-color: #ffffff;
 }
