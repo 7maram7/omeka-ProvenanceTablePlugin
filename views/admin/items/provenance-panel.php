@@ -9,7 +9,7 @@
     <thead>
         <tr>
             <?php for ($i = 1; $i <= $numColumns; $i++): ?>
-                <th><?php echo html_escape($columnNames[$i]); ?></th>
+                <th style="width: <?php echo $columnWidths[$i]; ?>%;"><?php echo html_escape($columnNames[$i]); ?></th>
             <?php endfor; ?>
             <th style="width: 80px;">Actions</th>
         </tr>

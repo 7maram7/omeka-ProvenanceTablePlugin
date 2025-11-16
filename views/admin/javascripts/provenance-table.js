@@ -41,17 +41,13 @@
         // Get number of columns from config
         var numColumns = (typeof ProvenanceTableConfig !== 'undefined') ? ProvenanceTableConfig.numColumns : 4;
 
-        // Get the next row index
-        var rowCount = $tbody.find('tr').length;
-        var rowIndex = rowCount;
-
         // Create new row
         var $newRow = $('<tr></tr>');
 
-        // Add input fields for each column with explicit row index
+        // Add input fields for each column (index will be set by reindexRows)
         for (var i = 1; i <= numColumns; i++) {
             var $td = $('<td></td>');
-            var $input = $('<input type="text" class="textinput provenance-col" name="provenance_data[' + rowIndex + '][col' + i + ']" value="" />');
+            var $input = $('<input type="text" class="textinput provenance-col" name="provenance_data[0][col' + i + ']" value="" />');
             $td.append($input);
             $newRow.append($td);
         }
@@ -62,8 +58,11 @@
         $actionTd.append($deleteBtn);
         $newRow.append($actionTd);
 
-        // Append to table
-        $tbody.append($newRow);
+        // Prepend to table (add at top)
+        $tbody.prepend($newRow);
+
+        // Re-index all rows
+        reindexRows();
 
         // Focus on first input of new row
         $newRow.find('input').first().focus();
