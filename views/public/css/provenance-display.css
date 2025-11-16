@@ -1,0 +1,9 @@
+/**
+ * Provenance Table Plugin - Public CSS
+ * Minimal styling - let Omeka's theme handle the table design
+ */
+
+#provenance-section table {
+    width: 100%;
+    border-collapse: collapse;
+}

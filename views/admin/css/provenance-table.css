@@ -1,0 +1,48 @@
+/**
+ * Provenance Table Plugin - Admin CSS
+ * Simple, clean styling that matches Omeka's default admin interface
+ */
+
+/* Table Styles - Simple and clean with thin borders */
+.provenance-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+
+.provenance-table thead th {
+    background: #f0f0f0;
+    padding: 8px;
+    text-align: left;
+    font-weight: normal;
+    border: 1px solid #ddd;
+    font-size: 12px;
+}
+
+.provenance-table tbody td {
+    padding: 5px;
+    border: 1px solid #ddd;
+}
+
+/* Input Fields - Match Omeka defaults, no border on inputs since table has borders */
+.provenance-table input[type="text"] {
+    width: 100%;
+    padding: 5px;
+    border: none;
+    font-size: 12px;
+    box-sizing: border-box;
+}
+
+.provenance-table input[type="text"]:focus {
+    outline: 1px solid #5b9dd9;
+}
+
+/* Buttons - Match Omeka button style */
+.add-provenance-row {
+    margin-top: 10px;
+}
+
+.delete-provenance-row {
+    font-size: 11px;
+    padding: 3px 8px;
+}
