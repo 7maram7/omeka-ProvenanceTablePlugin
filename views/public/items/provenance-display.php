@@ -8,7 +8,7 @@
 <div id="provenance-section" class="element">
     <h3><?php echo html_escape($tabName); ?></h3>
     <div class="element-text">
-        <table class="provenance-display-table">
+        <table>
             <thead>
                 <tr>
                     <?php for ($i = 1; $i <= $numColumns; $i++): ?>
