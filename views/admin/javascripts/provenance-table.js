@@ -59,7 +59,11 @@
         $newRow.append($actionTd);
 
         // Prepend to table (add at top)
+        console.log('Adding row at TOP using prepend()');
+        console.log('Table has ' + $tbody.find('tr').length + ' rows before prepend');
         $tbody.prepend($newRow);
+        console.log('Table has ' + $tbody.find('tr').length + ' rows after prepend');
+        console.log('New row is at index: ' + $newRow.index());
 
         // Re-index all rows
         reindexRows();
