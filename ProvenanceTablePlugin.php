@@ -44,10 +44,24 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
     {
         $db = $this->_db;
 
-        // Create provenance table
+        // Create provenance tables metadata table
+        $sql = "
+        CREATE TABLE IF NOT EXISTS `{$db->prefix}provenance_tables` (
+            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+            `item_id` int(10) unsigned NOT NULL,
+            `table_order` int(10) unsigned NOT NULL DEFAULT '0',
+            `notes` text COLLATE utf8_unicode_ci,
+            PRIMARY KEY (`id`),
+            KEY `item_id` (`item_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+        ";
+        $db->query($sql);
+
+        // Create provenance data table
         $sql = "
         CREATE TABLE IF NOT EXISTS `{$db->prefix}provenance_data` (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+            `table_id` int(10) unsigned NOT NULL,
             `item_id` int(10) unsigned NOT NULL,
             `row_order` int(10) unsigned NOT NULL DEFAULT '0',
             `col1` text COLLATE utf8_unicode_ci,
@@ -55,7 +69,8 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             `col3` text COLLATE utf8_unicode_ci,
             `col4` text COLLATE utf8_unicode_ci,
             PRIMARY KEY (`id`),
-            KEY `item_id` (`item_id`)
+            KEY `item_id` (`item_id`),
+            KEY `table_id` (`table_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ";
         $db->query($sql);
@@ -81,8 +96,10 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
     {
         $db = $this->_db;
 
-        // Drop provenance table
+        // Drop provenance tables
         $sql = "DROP TABLE IF EXISTS `{$db->prefix}provenance_data`";
+        $db->query($sql);
+        $sql = "DROP TABLE IF EXISTS `{$db->prefix}provenance_tables`";
         $db->query($sql);
 
         // Delete plugin options
@@ -106,11 +123,59 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
     {
         $oldVersion = $args['old_version'];
         $newVersion = $args['new_version'];
+        $db = $this->_db;
 
         // Handle upgrades from old version (field transformation) to new version (tabs)
         if (version_compare($oldVersion, '3.0.0', '<')) {
             // Remove old options
             delete_option('provenance_table_mappings');
+        }
+
+        // Upgrade to version 4.0.0 - Add support for multiple tables
+        if (version_compare($oldVersion, '4.0.0', '<')) {
+            // Create provenance_tables table
+            $sql = "
+            CREATE TABLE IF NOT EXISTS `{$db->prefix}provenance_tables` (
+                `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `item_id` int(10) unsigned NOT NULL,
+                `table_order` int(10) unsigned NOT NULL DEFAULT '0',
+                `notes` text COLLATE utf8_unicode_ci,
+                PRIMARY KEY (`id`),
+                KEY `item_id` (`item_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+            ";
+            $db->query($sql);
+
+            // Check if table_id column already exists
+            $columns = $db->fetchAll("SHOW COLUMNS FROM `{$db->prefix}provenance_data` LIKE 'table_id'");
+
+            if (empty($columns)) {
+                // Add table_id column to provenance_data
+                $sql = "ALTER TABLE `{$db->prefix}provenance_data`
+                        ADD `table_id` int(10) unsigned NOT NULL DEFAULT 0 AFTER `id`,
+                        ADD KEY `table_id` (`table_id`)";
+                $db->query($sql);
+
+                // Migrate existing data: create a default table for each item with provenance data
+                $sql = "SELECT DISTINCT item_id FROM `{$db->prefix}provenance_data`";
+                $items = $db->fetchAll($sql);
+
+                foreach ($items as $item) {
+                    $itemId = $item['item_id'];
+
+                    // Create a default table for this item
+                    $sql = "INSERT INTO `{$db->prefix}provenance_tables` (item_id, table_order, notes)
+                            VALUES (?, 0, '')";
+                    $db->query($sql, array($itemId));
+                    $tableId = $db->lastInsertId();
+
+                    // Link all existing rows to this table
+                    $sql = "UPDATE `{$db->prefix}provenance_data`
+                            SET table_id = ?
+                            WHERE item_id = ?";
+                    $db->query($sql, array($tableId, $itemId));
+                }
+            }
         }
     }
 
@@ -218,14 +283,14 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         $post = $args['post'];
 
         // Check if provenance data was submitted
-        if (!isset($post['provenance_data'])) {
+        if (!isset($post['provenance_tables'])) {
             return;
         }
 
         // Store in request registry to save after item is saved
         Zend_Registry::set('provenance_data_to_save', array(
             'item_id' => $item->id,
-            'data' => $post['provenance_data']
+            'data' => $post['provenance_tables']
         ));
     }
 
@@ -374,7 +439,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
     }
 
     /**
-     * Get provenance data for an item.
+     * Get provenance data for an item (all tables with their rows).
      */
     protected function _getProvenanceData($item)
     {
@@ -383,50 +448,77 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         }
 
         $db = $this->_db;
-        $sql = "SELECT * FROM {$db->prefix}provenance_data
-                WHERE item_id = ?
-                ORDER BY row_order ASC";
 
-        return $db->fetchAll($sql, array($item->id));
+        // Get all tables for this item
+        $sql = "SELECT * FROM {$db->prefix}provenance_tables
+                WHERE item_id = ?
+                ORDER BY table_order ASC";
+        $tables = $db->fetchAll($sql, array($item->id));
+
+        // Get rows for each table
+        foreach ($tables as &$table) {
+            $sql = "SELECT * FROM {$db->prefix}provenance_data
+                    WHERE table_id = ?
+                    ORDER BY row_order ASC";
+            $table['rows'] = $db->fetchAll($sql, array($table['id']));
+        }
+
+        return $tables;
     }
 
     /**
-     * Save provenance data for an item.
+     * Save provenance data for an item (multiple tables).
      */
     public static function saveProvenanceData($itemId, $data)
     {
         $db = get_db();
 
-        // Delete existing data
+        // Delete existing tables and data for this item
         $db->query("DELETE FROM {$db->prefix}provenance_data WHERE item_id = ?", array($itemId));
+        $db->query("DELETE FROM {$db->prefix}provenance_tables WHERE item_id = ?", array($itemId));
 
         // Insert new data
         if (is_array($data) && !empty($data)) {
-            $order = 0;
-            foreach ($data as $row) {
-                // Check if row has any non-empty data
-                $hasData = false;
-                for ($i = 1; $i <= 4; $i++) {
-                    $value = isset($row['col' . $i]) ? trim($row['col' . $i]) : '';
-                    if ($value !== '') {
-                        $hasData = true;
-                        break;
-                    }
-                }
+            $tableOrder = 0;
 
-                if ($hasData) {
-                    // Use direct SQL to avoid Zend's table name pluralization
-                    $sql = "INSERT INTO {$db->prefix}provenance_data
-                            (item_id, row_order, col1, col2, col3, col4)
-                            VALUES (?, ?, ?, ?, ?, ?)";
-                    $db->query($sql, array(
-                        $itemId,
-                        $order++,
-                        isset($row['col1']) ? trim($row['col1']) : '',
-                        isset($row['col2']) ? trim($row['col2']) : '',
-                        isset($row['col3']) ? trim($row['col3']) : '',
-                        isset($row['col4']) ? trim($row['col4']) : ''
-                    ));
+            foreach ($data as $tableData) {
+                // Create table entry
+                $notes = isset($tableData['notes']) ? trim($tableData['notes']) : '';
+                $sql = "INSERT INTO {$db->prefix}provenance_tables
+                        (item_id, table_order, notes)
+                        VALUES (?, ?, ?)";
+                $db->query($sql, array($itemId, $tableOrder++, $notes));
+                $tableId = $db->lastInsertId();
+
+                // Insert rows for this table
+                if (isset($tableData['rows']) && is_array($tableData['rows'])) {
+                    $rowOrder = 0;
+                    foreach ($tableData['rows'] as $row) {
+                        // Check if row has any non-empty data
+                        $hasData = false;
+                        for ($i = 1; $i <= 4; $i++) {
+                            $value = isset($row['col' . $i]) ? trim($row['col' . $i]) : '';
+                            if ($value !== '') {
+                                $hasData = true;
+                                break;
+                            }
+                        }
+
+                        if ($hasData) {
+                            $sql = "INSERT INTO {$db->prefix}provenance_data
+                                    (table_id, item_id, row_order, col1, col2, col3, col4)
+                                    VALUES (?, ?, ?, ?, ?, ?, ?)";
+                            $db->query($sql, array(
+                                $tableId,
+                                $itemId,
+                                $rowOrder++,
+                                isset($row['col1']) ? trim($row['col1']) : '',
+                                isset($row['col2']) ? trim($row['col2']) : '',
+                                isset($row['col3']) ? trim($row['col3']) : '',
+                                isset($row['col4']) ? trim($row['col4']) : ''
+                            ));
+                        }
+                    }
                 }
             }
         }
