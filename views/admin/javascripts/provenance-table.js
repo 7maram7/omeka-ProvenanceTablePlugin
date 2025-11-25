@@ -269,10 +269,12 @@
             $(this).find('input.provenance-col').each(function() {
                 var name = $(this).attr('name');
                 // Replace with correct table and row index
-                var newName = 'provenance_tables[' + tableIndex + '][rows][' + rowIndex + '][col';
-                var colNum = name.match(/col(\d+)/)[1];
-                newName += colNum + ']';
-                $(this).attr('name', newName);
+                var match = name.match(/col(\d+)/);
+                if (match) {
+                    var colNum = match[1];
+                    var newName = 'provenance_tables[' + tableIndex + '][rows][' + rowIndex + '][col' + colNum + ']';
+                    $(this).attr('name', newName);
+                }
             });
         });
     }
