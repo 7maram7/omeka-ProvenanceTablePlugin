@@ -20,6 +20,7 @@
                 <table class="provenance-table">
                     <thead>
                         <tr>
+                            <th style="width: 30px;"></th>
                             <?php for ($i = 1; $i <= $numColumns; $i++): ?>
                                 <th style="width: <?php echo $columnWidths[$i]; ?>%;"><?php echo html_escape($columnNames[$i]); ?></th>
                             <?php endfor; ?>
@@ -30,6 +31,9 @@
                         <?php if (!empty($tableData['rows'])): ?>
                             <?php foreach ($tableData['rows'] as $rowIndex => $row): ?>
                                 <tr>
+                                    <td class="drag-handle" style="text-align: center; cursor: move;">
+                                        <span class="drag-icon">⋮⋮</span>
+                                    </td>
                                     <?php for ($i = 1; $i <= $numColumns; $i++): ?>
                                         <td>
                                             <input type="text"
@@ -45,6 +49,9 @@
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
+                                <td class="drag-handle" style="text-align: center; cursor: move;">
+                                    <span class="drag-icon">⋮⋮</span>
+                                </td>
                                 <?php for ($i = 1; $i <= $numColumns; $i++): ?>
                                     <td>
                                         <input type="text"
@@ -83,6 +90,7 @@
             <table class="provenance-table">
                 <thead>
                     <tr>
+                        <th style="width: 30px;"></th>
                         <?php for ($i = 1; $i <= $numColumns; $i++): ?>
                             <th style="width: <?php echo $columnWidths[$i]; ?>%;"><?php echo html_escape($columnNames[$i]); ?></th>
                         <?php endfor; ?>
@@ -91,6 +99,9 @@
                 </thead>
                 <tbody class="provenance-table-body">
                     <tr>
+                        <td class="drag-handle" style="text-align: center; cursor: move;">
+                            <span class="drag-icon">⋮⋮</span>
+                        </td>
                         <?php for ($i = 1; $i <= $numColumns; $i++): ?>
                             <td>
                                 <input type="text"

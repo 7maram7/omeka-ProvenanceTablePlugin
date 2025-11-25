@@ -19,6 +19,9 @@
             return;
         }
 
+        // Initialize drag and drop for existing tables
+        initializeSortable();
+
         // Bind add table button
         $(document).on('click', '.add-provenance-table', function(e) {
             e.preventDefault();
@@ -46,6 +49,41 @@
     }
 
     /**
+     * Initialize jQuery UI Sortable on all table bodies
+     */
+    function initializeSortable() {
+        $('.provenance-table-body').each(function() {
+            var $tbody = $(this);
+
+            // Destroy existing sortable if it exists
+            if ($tbody.hasClass('ui-sortable')) {
+                $tbody.sortable('destroy');
+            }
+
+            // Initialize sortable
+            $tbody.sortable({
+                handle: '.drag-handle',
+                axis: 'y',
+                cursor: 'move',
+                opacity: 0.8,
+                helper: function(e, tr) {
+                    var $originals = tr.children();
+                    var $helper = tr.clone();
+                    $helper.children().each(function(index) {
+                        $(this).width($originals.eq(index).width());
+                    });
+                    return $helper;
+                },
+                update: function(event, ui) {
+                    // Re-index rows after sorting
+                    var $wrapper = $(this).closest('.provenance-table-wrapper');
+                    reindexRowsInTable($wrapper);
+                }
+            });
+        });
+    }
+
+    /**
      * Add a new table
      */
     function addTable() {
@@ -69,6 +107,8 @@
 
         // Add header
         var $thead = $('<thead><tr></tr></thead>');
+        // Add empty header for drag handle column
+        $thead.find('tr').append('<th style="width: 30px;"></th>');
         for (var i = 1; i <= numColumns; i++) {
             var colName = columnNames[i] || ('Column ' + i);
             var colWidth = columnWidths[i] || 25;
@@ -80,6 +120,8 @@
         // Add body with one empty row
         var $tbody = $('<tbody class="provenance-table-body"></tbody>');
         var $row = $('<tr></tr>');
+        // Add drag handle
+        $row.append('<td class="drag-handle" style="text-align: center; cursor: move;"><span class="drag-icon">⋮⋮</span></td>');
         for (var i = 1; i <= numColumns; i++) {
             var $td = $('<td></td>');
             var $input = $('<input type="text" class="textinput provenance-col" name="provenance_tables[' + tableCount + '][rows][0][col' + i + ']" value="" />');
@@ -106,6 +148,9 @@
 
         // Re-index all tables
         reindexTables();
+
+        // Initialize sortable on the new table
+        initializeSortable();
 
         // Focus on notes field
         $newWrapper.find('textarea').first().focus();
@@ -140,6 +185,11 @@
 
         // Create new row
         var $newRow = $('<tr></tr>');
+
+        // Add drag handle
+        var $dragTd = $('<td class="drag-handle" style="text-align: center; cursor: move;"></td>');
+        $dragTd.append('<span class="drag-icon">⋮⋮</span>');
+        $newRow.append($dragTd);
 
         // Add input fields for each column (index will be set by reindexRows)
         for (var i = 1; i <= numColumns; i++) {
