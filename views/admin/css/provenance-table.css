@@ -46,3 +46,49 @@
     font-size: 11px;
     padding: 3px 8px;
 }
+
+/* Drag and Drop Styles */
+.drag-handle {
+    cursor: move;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.drag-icon {
+    color: #999;
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-block;
+    line-height: 1;
+}
+
+.drag-handle:hover .drag-icon {
+    color: #555;
+}
+
+/* Active dragging state */
+.provenance-table-body.ui-sortable .ui-sortable-helper {
+    background-color: #f9f9f9;
+    opacity: 0.8;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.provenance-table-body.ui-sortable .ui-sortable-placeholder {
+    background-color: #e3f2fd;
+    border: 2px dashed #5b9dd9;
+    visibility: visible !important;
+}
+
+.provenance-table-body tr.ui-sortable-helper td {
+    border-color: #5b9dd9;
+}
+
+/* Prevent text selection during drag */
+.provenance-table-body.ui-sortable-dragging {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
