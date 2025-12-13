@@ -21,9 +21,9 @@
                     <thead>
                         <tr>
                             <th style="width: 30px;"></th>
-                            <?php for ($i = 1; $i <= $numColumns; $i++): ?>
+                            <?php foreach ($enabledColumns as $i): ?>
                                 <th style="width: <?php echo $columnWidths[$i]; ?>%;"><?php echo html_escape($columnNames[$i]); ?></th>
-                            <?php endfor; ?>
+                            <?php endforeach; ?>
                             <th style="width: 80px;">Actions</th>
                         </tr>
                     </thead>
@@ -34,14 +34,14 @@
                                     <td class="drag-handle" style="text-align: center; cursor: move;">
                                         <span class="drag-icon">⋮⋮</span>
                                     </td>
-                                    <?php for ($i = 1; $i <= $numColumns; $i++): ?>
+                                    <?php foreach ($enabledColumns as $i): ?>
                                         <td>
                                             <input type="text"
                                                    class="textinput provenance-col"
                                                    name="provenance_tables[<?php echo $tableIndex; ?>][rows][<?php echo $rowIndex; ?>][col<?php echo $i; ?>]"
                                                    value="<?php echo html_escape($row['col' . $i]); ?>" />
                                         </td>
-                                    <?php endfor; ?>
+                                    <?php endforeach; ?>
                                     <td style="text-align: center;">
                                         <button type="button" class="button delete-provenance-row">Delete Row</button>
                                     </td>
@@ -52,14 +52,14 @@
                                 <td class="drag-handle" style="text-align: center; cursor: move;">
                                     <span class="drag-icon">⋮⋮</span>
                                 </td>
-                                <?php for ($i = 1; $i <= $numColumns; $i++): ?>
+                                <?php foreach ($enabledColumns as $i): ?>
                                     <td>
                                         <input type="text"
                                                class="textinput provenance-col"
                                                name="provenance_tables[<?php echo $tableIndex; ?>][rows][0][col<?php echo $i; ?>]"
                                                value="" />
                                     </td>
-                                <?php endfor; ?>
+                                <?php endforeach; ?>
                                 <td style="text-align: center;">
                                     <button type="button" class="button delete-provenance-row">Delete Row</button>
                                 </td>
@@ -91,9 +91,9 @@
                 <thead>
                     <tr>
                         <th style="width: 30px;"></th>
-                        <?php for ($i = 1; $i <= $numColumns; $i++): ?>
+                        <?php foreach ($enabledColumns as $i): ?>
                             <th style="width: <?php echo $columnWidths[$i]; ?>%;"><?php echo html_escape($columnNames[$i]); ?></th>
-                        <?php endfor; ?>
+                        <?php endforeach; ?>
                         <th style="width: 80px;">Actions</th>
                     </tr>
                 </thead>
@@ -102,14 +102,14 @@
                         <td class="drag-handle" style="text-align: center; cursor: move;">
                             <span class="drag-icon">⋮⋮</span>
                         </td>
-                        <?php for ($i = 1; $i <= $numColumns; $i++): ?>
+                        <?php foreach ($enabledColumns as $i): ?>
                             <td>
                                 <input type="text"
                                        class="textinput provenance-col"
                                        name="provenance_tables[0][rows][0][col<?php echo $i; ?>]"
                                        value="" />
                             </td>
-                        <?php endfor; ?>
+                        <?php endforeach; ?>
                         <td style="text-align: center;">
                             <button type="button" class="button delete-provenance-row">Delete Row</button>
                         </td>
@@ -137,6 +137,7 @@
 // Store configuration for JavaScript
 var ProvenanceTableConfig = {
     numColumns: <?php echo $numColumns; ?>,
+    enabledColumns: <?php echo json_encode($enabledColumns); ?>,
     columnNames: <?php echo json_encode($columnNames); ?>,
     columnWidths: <?php echo json_encode($columnWidths); ?>
 };

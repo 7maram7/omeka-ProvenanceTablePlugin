@@ -76,7 +76,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         $db->query($sql);
 
         // Set default configuration options
-        set_option('provenance_tab_name', 'Provenance');
+        set_option('provenance_tab_name', 'Specimens');
         set_option('provenance_num_columns', '4');
         set_option('provenance_col1_name', 'No.');
         set_option('provenance_col2_name', 'Auction/Collection');
@@ -85,7 +85,11 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         set_option('provenance_col1_width', '5');
         set_option('provenance_col2_width', '30');
         set_option('provenance_col3_width', '15');
-        set_option('provenance_col4_width', '30');
+        set_option('provenance_col4_width', '50');
+        set_option('provenance_col1_enabled', '1');
+        set_option('provenance_col2_enabled', '1');
+        set_option('provenance_col3_enabled', '0'); // Disabled by default
+        set_option('provenance_col4_enabled', '1');
         set_option('provenance_enabled_item_types', 'all'); // 'all' or serialized array of IDs
     }
 
@@ -199,15 +203,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             set_option('provenance_tab_name', trim($post['provenance_tab_name']));
         }
 
-        // Save number of columns (2-4)
-        if (isset($post['provenance_num_columns'])) {
-            $numCols = (int)$post['provenance_num_columns'];
-            if ($numCols < 2) $numCols = 2;
-            if ($numCols > 4) $numCols = 4;
-            set_option('provenance_num_columns', $numCols);
-        }
-
-        // Save column names and widths
+        // Save column names, widths, and enabled status
         for ($i = 1; $i <= 4; $i++) {
             if (isset($post['provenance_col' . $i . '_name'])) {
                 set_option('provenance_col' . $i . '_name', trim($post['provenance_col' . $i . '_name']));
@@ -219,6 +215,9 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
                 if ($width > 100) $width = 100;
                 set_option('provenance_col' . $i . '_width', $width);
             }
+            // Save enabled status (checkbox)
+            $enabled = isset($post['provenance_col' . $i . '_enabled']) ? '1' : '0';
+            set_option('provenance_col' . $i . '_enabled', $enabled);
         }
 
         // Save enabled item types
@@ -254,14 +253,19 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         // Get existing provenance data for this item
         $provenanceData = $this->_getProvenanceData($item);
 
-        // Get column configuration
-        $numColumns = (int)get_option('provenance_num_columns') ?: 4;
+        // Get column configuration - only include enabled columns
+        $enabledColumns = array();
         $columnNames = array();
         $columnWidths = array();
-        for ($i = 1; $i <= $numColumns; $i++) {
-            $columnNames[$i] = get_option('provenance_col' . $i . '_name') ?: 'Column ' . $i;
-            $columnWidths[$i] = (int)get_option('provenance_col' . $i . '_width') ?: (($i == 1) ? 5 : 30);
+        for ($i = 1; $i <= 4; $i++) {
+            $enabled = get_option('provenance_col' . $i . '_enabled');
+            if ($enabled !== '0') {
+                $enabledColumns[] = $i;
+                $columnNames[$i] = get_option('provenance_col' . $i . '_name') ?: 'Column ' . $i;
+                $columnWidths[$i] = (int)get_option('provenance_col' . $i . '_width') ?: (($i == 1) ? 5 : 30);
+            }
         }
+        $numColumns = count($enabledColumns);
 
         // Generate the HTML content for the tab
         ob_start();
@@ -350,14 +354,19 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             return;
         }
 
-        // Get column configuration
-        $numColumns = (int)get_option('provenance_num_columns') ?: 4;
+        // Get column configuration - only include enabled columns
+        $enabledColumns = array();
         $columnNames = array();
         $columnWidths = array();
-        for ($i = 1; $i <= $numColumns; $i++) {
-            $columnNames[$i] = get_option('provenance_col' . $i . '_name') ?: 'Column ' . $i;
-            $columnWidths[$i] = (int)get_option('provenance_col' . $i . '_width') ?: (($i == 1) ? 5 : 30);
+        for ($i = 1; $i <= 4; $i++) {
+            $enabled = get_option('provenance_col' . $i . '_enabled');
+            if ($enabled !== '0') {
+                $enabledColumns[] = $i;
+                $columnNames[$i] = get_option('provenance_col' . $i . '_name') ?: 'Column ' . $i;
+                $columnWidths[$i] = (int)get_option('provenance_col' . $i . '_width') ?: (($i == 1) ? 5 : 30);
+            }
         }
+        $numColumns = count($enabledColumns);
 
         $tabName = get_option('provenance_tab_name') ?: 'Provenance';
 
@@ -401,14 +410,19 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             return;
         }
 
-        // Get column configuration
-        $numColumns = (int)get_option('provenance_num_columns') ?: 4;
+        // Get column configuration - only include enabled columns
+        $enabledColumns = array();
         $columnNames = array();
         $columnWidths = array();
-        for ($i = 1; $i <= $numColumns; $i++) {
-            $columnNames[$i] = get_option('provenance_col' . $i . '_name') ?: 'Column ' . $i;
-            $columnWidths[$i] = (int)get_option('provenance_col' . $i . '_width') ?: (($i == 1) ? 5 : 30);
+        for ($i = 1; $i <= 4; $i++) {
+            $enabled = get_option('provenance_col' . $i . '_enabled');
+            if ($enabled !== '0') {
+                $enabledColumns[] = $i;
+                $columnNames[$i] = get_option('provenance_col' . $i . '_name') ?: 'Column ' . $i;
+                $columnWidths[$i] = (int)get_option('provenance_col' . $i . '_width') ?: (($i == 1) ? 5 : 30);
+            }
         }
+        $numColumns = count($enabledColumns);
 
         $tabName = get_option('provenance_tab_name') ?: 'Provenance';
 
