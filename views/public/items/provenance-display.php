@@ -56,7 +56,7 @@
                                 ?>
                                 <tr>
                                     <?php for ($i = 1; $i <= 3; $i++): ?>
-                                        <td><?php echo html_escape($row['col' . $i]); ?></td>
+                                        <td><?php echo nl2br(html_escape($row['col' . $i])); ?></td>
                                     <?php endfor; ?>
                                 </tr>
                             <?php endforeach; ?>
