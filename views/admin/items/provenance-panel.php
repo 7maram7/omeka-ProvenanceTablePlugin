@@ -15,9 +15,13 @@
                               class="provenance-notes textinput"
                               rows="3"
                               style="width: 100%;"><?php
-                        // Strip all variations of <br> tags and convert to newlines
-                        $cleanedNotes = preg_replace('/<br\s*\/?\s*>/i', "\n", $tableData['notes']);
-                        echo html_escape($cleanedNotes);
+                        // Get the text and strip ALL forms of br tags
+                        $notes = $tableData['notes'];
+                        // Strip HTML escaped br tags
+                        $notes = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $notes);
+                        // Strip literal br tags
+                        $notes = preg_replace('/<br\s*\/?\s*>/i', "\n", $notes);
+                        echo html_escape($notes);
                     ?></textarea>
                 </div>
 
@@ -43,9 +47,13 @@
                                             <textarea class="textinput provenance-col"
                                                       name="provenance_tables[<?php echo $tableIndex; ?>][rows][<?php echo $rowIndex; ?>][col<?php echo $i; ?>]"
                                                       rows="2"><?php
-                                                // Strip all variations of <br> tags and convert to newlines
-                                                $cleanedText = preg_replace('/<br\s*\/?\s*>/i', "\n", $row['col' . $i]);
-                                                echo html_escape($cleanedText);
+                                                // Get the text and strip ALL forms of br tags
+                                                $text = $row['col' . $i];
+                                                // Strip HTML escaped br tags
+                                                $text = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $text);
+                                                // Strip literal br tags
+                                                $text = preg_replace('/<br\s*\/?\s*>/i', "\n", $text);
+                                                echo html_escape($text);
                                             ?></textarea>
                                         </td>
                                     <?php endfor; ?>
