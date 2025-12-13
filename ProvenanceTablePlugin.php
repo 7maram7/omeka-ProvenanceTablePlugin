@@ -500,7 +500,9 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
 
             foreach ($data as $tableData) {
                 // Create table entry
+                // Strip any <br> tags that might have been added by form processing
                 $notes = isset($tableData['notes']) ? trim($tableData['notes']) : '';
+                $notes = preg_replace('/<br\s*\/?\s*>/i', "\n", $notes);
                 $sql = "INSERT INTO {$db->prefix}provenance_tables
                         (item_id, table_order, notes)
                         VALUES (?, ?, ?)";
@@ -522,6 +524,15 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
                         }
 
                         if ($hasData) {
+                            // Strip any <br> tags from column data before saving
+                            $col1 = isset($row['col1']) ? trim($row['col1']) : '';
+                            $col2 = isset($row['col2']) ? trim($row['col2']) : '';
+                            $col3 = isset($row['col3']) ? trim($row['col3']) : '';
+
+                            $col1 = preg_replace('/<br\s*\/?\s*>/i', "\n", $col1);
+                            $col2 = preg_replace('/<br\s*\/?\s*>/i', "\n", $col2);
+                            $col3 = preg_replace('/<br\s*\/?\s*>/i', "\n", $col3);
+
                             $sql = "INSERT INTO {$db->prefix}provenance_data
                                     (table_id, item_id, row_order, col1, col2, col3)
                                     VALUES (?, ?, ?, ?, ?, ?)";
@@ -529,9 +540,9 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
                                 $tableId,
                                 $itemId,
                                 $rowOrder++,
-                                isset($row['col1']) ? trim($row['col1']) : '',
-                                isset($row['col2']) ? trim($row['col2']) : '',
-                                isset($row['col3']) ? trim($row['col3']) : ''
+                                $col1,
+                                $col2,
+                                $col3
                             ));
                         }
                     }
