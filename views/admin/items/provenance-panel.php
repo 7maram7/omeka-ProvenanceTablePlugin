@@ -14,7 +14,11 @@
                     <textarea name="provenance_tables[<?php echo $tableIndex; ?>][notes]"
                               class="provenance-notes textinput"
                               rows="3"
-                              style="width: 100%;"><?php echo html_escape($tableData['notes']); ?></textarea>
+                              style="width: 100%;"><?php
+                        // Strip all variations of <br> tags and convert to newlines
+                        $cleanedNotes = preg_replace('/<br\s*\/?\s*>/i', "\n", $tableData['notes']);
+                        echo html_escape($cleanedNotes);
+                    ?></textarea>
                 </div>
 
                 <table class="provenance-table">
@@ -38,7 +42,11 @@
                                         <td>
                                             <textarea class="textinput provenance-col"
                                                       name="provenance_tables[<?php echo $tableIndex; ?>][rows][<?php echo $rowIndex; ?>][col<?php echo $i; ?>]"
-                                                      rows="2"><?php echo html_escape($row['col' . $i]); ?></textarea>
+                                                      rows="2"><?php
+                                                // Strip all variations of <br> tags and convert to newlines
+                                                $cleanedText = preg_replace('/<br\s*\/?\s*>/i', "\n", $row['col' . $i]);
+                                                echo html_escape($cleanedText);
+                                            ?></textarea>
                                         </td>
                                     <?php endfor; ?>
                                     <td style="text-align: center;">
