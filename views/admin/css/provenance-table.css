@@ -20,21 +20,28 @@
 }
 
 .provenance-table tbody td {
-    padding: 5px;
+    padding: 0;
     border: 1px solid #ddd;
+    vertical-align: top;
 }
 
-/* Input Fields - Match Omeka defaults, no border on inputs since table has borders */
-.provenance-table input[type="text"] {
+/* Textarea Fields - Match Omeka defaults, no border since table has borders */
+.provenance-table textarea.provenance-col {
     width: 100%;
-    padding: 5px;
+    padding: 6px;
     border: none;
-    font-size: 12px;
+    font-size: 13px;
+    font-family: inherit;
+    line-height: 1.4;
     box-sizing: border-box;
+    resize: vertical;
+    overflow-y: auto;
+    min-height: 40px;
 }
 
-.provenance-table input[type="text"]:focus {
-    outline: 1px solid #5b9dd9;
+.provenance-table textarea.provenance-col:focus {
+    outline: 2px solid #5b9dd9;
+    outline-offset: -2px;
 }
 
 /* Buttons - Match Omeka button style */

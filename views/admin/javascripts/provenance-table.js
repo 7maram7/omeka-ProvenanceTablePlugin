@@ -124,8 +124,8 @@
         $row.append('<td class="drag-handle" style="text-align: center; cursor: move;"><span class="drag-icon">⋮⋮</span></td>');
         for (var i = 1; i <= numColumns; i++) {
             var $td = $('<td></td>');
-            var $input = $('<input type="text" class="textinput provenance-col" name="provenance_tables[' + tableCount + '][rows][0][col' + i + ']" value="" />');
-            $td.append($input);
+            var $textarea = $('<textarea class="textinput provenance-col" name="provenance_tables[' + tableCount + '][rows][0][col' + i + ']" rows="2"></textarea>');
+            $td.append($textarea);
             $row.append($td);
         }
         $row.append('<td style="text-align: center;"><button type="button" class="button delete-provenance-row">Delete Row</button></td>');
@@ -191,11 +191,11 @@
         $dragTd.append('<span class="drag-icon">⋮⋮</span>');
         $newRow.append($dragTd);
 
-        // Add input fields for each column (index will be set by reindexRows)
+        // Add textarea fields for each column (index will be set by reindexRows)
         for (var i = 1; i <= numColumns; i++) {
             var $td = $('<td></td>');
-            var $input = $('<input type="text" class="textinput provenance-col" name="provenance_tables[' + tableIndex + '][rows][0][col' + i + ']" value="" />');
-            $td.append($input);
+            var $textarea = $('<textarea class="textinput provenance-col" name="provenance_tables[' + tableIndex + '][rows][0][col' + i + ']" rows="2"></textarea>');
+            $td.append($textarea);
             $newRow.append($td);
         }
 
@@ -211,8 +211,8 @@
         // Re-index rows in this table
         reindexRowsInTable($wrapper);
 
-        // Focus on first input of new row
-        $newRow.find('input').first().focus();
+        // Focus on first textarea of new row
+        $newRow.find('textarea').first().focus();
     }
 
     /**
@@ -266,7 +266,7 @@
     function reindexRowsInTable($wrapper) {
         var tableIndex = $wrapper.attr('data-table-index');
         $wrapper.find('.provenance-table-body tr').each(function(rowIndex) {
-            $(this).find('input.provenance-col').each(function() {
+            $(this).find('textarea.provenance-col').each(function() {
                 var name = $(this).attr('name');
                 // Replace with correct table and row index
                 var match = name.match(/col(\d+)/);

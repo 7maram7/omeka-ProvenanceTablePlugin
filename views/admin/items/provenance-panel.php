@@ -36,10 +36,9 @@
                                     </td>
                                     <?php for ($i = 1; $i <= 3; $i++): ?>
                                         <td>
-                                            <input type="text"
-                                                   class="textinput provenance-col"
-                                                   name="provenance_tables[<?php echo $tableIndex; ?>][rows][<?php echo $rowIndex; ?>][col<?php echo $i; ?>]"
-                                                   value="<?php echo html_escape($row['col' . $i]); ?>" />
+                                            <textarea class="textinput provenance-col"
+                                                      name="provenance_tables[<?php echo $tableIndex; ?>][rows][<?php echo $rowIndex; ?>][col<?php echo $i; ?>]"
+                                                      rows="2"><?php echo html_escape($row['col' . $i]); ?></textarea>
                                         </td>
                                     <?php endfor; ?>
                                     <td style="text-align: center;">
@@ -54,10 +53,9 @@
                                 </td>
                                 <?php for ($i = 1; $i <= 3; $i++): ?>
                                     <td>
-                                        <input type="text"
-                                               class="textinput provenance-col"
-                                               name="provenance_tables[<?php echo $tableIndex; ?>][rows][0][col<?php echo $i; ?>]"
-                                               value="" />
+                                        <textarea class="textinput provenance-col"
+                                                  name="provenance_tables[<?php echo $tableIndex; ?>][rows][0][col<?php echo $i; ?>]"
+                                                  rows="2"></textarea>
                                     </td>
                                 <?php endfor; ?>
                                 <td style="text-align: center;">
@@ -104,10 +102,9 @@
                         </td>
                         <?php for ($i = 1; $i <= 3; $i++): ?>
                             <td>
-                                <input type="text"
-                                       class="textinput provenance-col"
-                                       name="provenance_tables[0][rows][0][col<?php echo $i; ?>]"
-                                       value="" />
+                                <textarea class="textinput provenance-col"
+                                          name="provenance_tables[0][rows][0][col<?php echo $i; ?>]"
+                                          rows="2"></textarea>
                             </td>
                         <?php endfor; ?>
                         <td style="text-align: center;">
