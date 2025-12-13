@@ -4,20 +4,13 @@
  * Simple layout matching Omeka's default config forms
  */
 
-$tabName = get_option('provenance_tab_name') ?: 'Provenance';
-$numColumns = (int)get_option('provenance_num_columns') ?: 4;
+$tabName = get_option('provenance_tab_name') ?: 'Specimens';
 $col1Name = get_option('provenance_col1_name') ?: 'No.';
 $col2Name = get_option('provenance_col2_name') ?: 'Auction/Collection';
-$col3Name = get_option('provenance_col3_name') ?: 'Date';
-$col4Name = get_option('provenance_col4_name') ?: 'Characteristics';
+$col3Name = get_option('provenance_col3_name') ?: 'Characteristics';
 $col1Width = get_option('provenance_col1_width') ?: '5';
 $col2Width = get_option('provenance_col2_width') ?: '30';
-$col3Width = get_option('provenance_col3_width') ?: '15';
-$col4Width = get_option('provenance_col4_width') ?: '30';
-$col1Enabled = get_option('provenance_col1_enabled') !== '0';
-$col2Enabled = get_option('provenance_col2_enabled') !== '0';
-$col3Enabled = get_option('provenance_col3_enabled') !== '0';
-$col4Enabled = get_option('provenance_col4_enabled') !== '0';
+$col3Width = get_option('provenance_col3_width') ?: '65';
 $enabledItemTypes = get_option('provenance_enabled_item_types') ?: 'all';
 
 // Get all item types
@@ -34,14 +27,7 @@ $itemTypes = get_db()->getTable('ItemType')->findAll();
 </div>
 
 <h2>Column Settings</h2>
-<p class="explanation">Choose which columns to display and configure their names and widths. You can enable/disable individual columns.</p>
-
-<div class="field">
-    <label>
-        <input type="checkbox" name="provenance_col1_enabled" value="1" <?php echo $col1Enabled ? 'checked' : ''; ?> />
-        <strong>Enable Column 1</strong>
-    </label>
-</div>
+<p class="explanation">Configure the names and widths of the three columns.</p>
 
 <div class="field">
     <label for="provenance_col1_name">Column 1 Name</label>
@@ -63,13 +49,6 @@ $itemTypes = get_db()->getTable('ItemType')->findAll();
 <hr style="margin: 20px 0;" />
 
 <div class="field">
-    <label>
-        <input type="checkbox" name="provenance_col2_enabled" value="1" <?php echo $col2Enabled ? 'checked' : ''; ?> />
-        <strong>Enable Column 2</strong>
-    </label>
-</div>
-
-<div class="field">
     <label for="provenance_col2_name">Column 2 Name</label>
     <div class="inputs">
         <input type="text" name="provenance_col2_name" id="provenance_col2_name"
@@ -89,13 +68,6 @@ $itemTypes = get_db()->getTable('ItemType')->findAll();
 <hr style="margin: 20px 0;" />
 
 <div class="field">
-    <label>
-        <input type="checkbox" name="provenance_col3_enabled" value="1" <?php echo $col3Enabled ? 'checked' : ''; ?> />
-        <strong>Enable Column 3</strong>
-    </label>
-</div>
-
-<div class="field">
     <label for="provenance_col3_name">Column 3 Name</label>
     <div class="inputs">
         <input type="text" name="provenance_col3_name" id="provenance_col3_name"
@@ -108,32 +80,6 @@ $itemTypes = get_db()->getTable('ItemType')->findAll();
     <div class="inputs">
         <input type="number" name="provenance_col3_width" id="provenance_col3_width"
                value="<?php echo html_escape($col3Width); ?>" class="textinput" size="5" min="1" max="100" />
-        <p class="explanation">Width as percentage</p>
-    </div>
-</div>
-
-<hr style="margin: 20px 0;" />
-
-<div class="field">
-    <label>
-        <input type="checkbox" name="provenance_col4_enabled" value="1" <?php echo $col4Enabled ? 'checked' : ''; ?> />
-        <strong>Enable Column 4</strong>
-    </label>
-</div>
-
-<div class="field">
-    <label for="provenance_col4_name">Column 4 Name</label>
-    <div class="inputs">
-        <input type="text" name="provenance_col4_name" id="provenance_col4_name"
-               value="<?php echo html_escape($col4Name); ?>" class="textinput" size="30" />
-    </div>
-</div>
-
-<div class="field">
-    <label for="provenance_col4_width">Column 4 Width (%)</label>
-    <div class="inputs">
-        <input type="number" name="provenance_col4_width" id="provenance_col4_width"
-               value="<?php echo html_escape($col4Width); ?>" class="textinput" size="5" min="1" max="100" />
         <p class="explanation">Width as percentage</p>
     </div>
 </div>
