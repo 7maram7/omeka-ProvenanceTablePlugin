@@ -209,7 +209,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
      */
     public function hookConfigForm()
     {
-        include 'config_form.php';
+        include dirname(__FILE__) . '/config_form.php';
     }
 
     /**
