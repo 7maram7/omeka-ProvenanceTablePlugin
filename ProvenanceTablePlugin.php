@@ -304,10 +304,34 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             return;
         }
 
+        // Strip ALL br tags from the POST data before storing
+        $cleanedData = $post['provenance_tables'];
+        if (is_array($cleanedData)) {
+            foreach ($cleanedData as $tableIndex => &$tableData) {
+                // Strip from notes
+                if (isset($tableData['notes'])) {
+                    $tableData['notes'] = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $tableData['notes']);
+                    $tableData['notes'] = preg_replace('/<br\s*\/?\s*>/i', "\n", $tableData['notes']);
+                }
+                // Strip from rows
+                if (isset($tableData['rows']) && is_array($tableData['rows'])) {
+                    foreach ($tableData['rows'] as $rowIndex => &$row) {
+                        for ($i = 1; $i <= 3; $i++) {
+                            $colKey = 'col' . $i;
+                            if (isset($row[$colKey])) {
+                                $row[$colKey] = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $row[$colKey]);
+                                $row[$colKey] = preg_replace('/<br\s*\/?\s*>/i', "\n", $row[$colKey]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Store in request registry to save after item is saved
         Zend_Registry::set('provenance_data_to_save', array(
             'item_id' => $item->id,
-            'data' => $post['provenance_tables']
+            'data' => $cleanedData
         ));
     }
 
