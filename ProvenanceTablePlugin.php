@@ -304,12 +304,19 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             return;
         }
 
-        // DEBUG: Log raw POST data to find where br tags come from
-        error_log("=== PROVENANCE DEBUG ===");
+        // DEBUG: Write raw POST data to file
+        $debugFile = dirname(__FILE__) . '/debug_post.txt';
+        $debugData = "=== DEBUG " . date('Y-m-d H:i:s') . " ===\n";
         if (isset($post['provenance_tables'][0]['rows'][0]['col1'])) {
-            error_log("RAW POST col1: " . var_export($post['provenance_tables'][0]['rows'][0]['col1'], true));
+            $debugData .= "RAW POST col1:\n";
+            $debugData .= var_export($post['provenance_tables'][0]['rows'][0]['col1'], true) . "\n";
         }
-        error_log("========================");
+        if (isset($post['provenance_tables'][0]['rows'][0]['col2'])) {
+            $debugData .= "RAW POST col2:\n";
+            $debugData .= var_export($post['provenance_tables'][0]['rows'][0]['col2'], true) . "\n";
+        }
+        $debugData .= "========================\n\n";
+        file_put_contents($debugFile, $debugData, FILE_APPEND);
 
         // Store in request registry to save after item is saved
         // TEMPORARILY NOT STRIPPING - to see what raw POST data contains
