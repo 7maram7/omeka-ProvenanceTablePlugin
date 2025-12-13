@@ -25,6 +25,11 @@
     vertical-align: top;
 }
 
+/* Action column (delete button) should be centered vertically */
+.provenance-table tbody td:last-child {
+    vertical-align: middle;
+}
+
 /* Textarea Fields - Match Omeka defaults, no border since table has borders */
 .provenance-table textarea.provenance-col {
     width: 100%;
