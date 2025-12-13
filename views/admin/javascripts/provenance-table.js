@@ -89,8 +89,7 @@
     function addTable() {
         var $container = $('#provenance-tables-container');
         var tableCount = $container.find('.provenance-table-wrapper').length;
-        var numColumns = (typeof ProvenanceTableConfig !== 'undefined') ? ProvenanceTableConfig.numColumns : 4;
-        var enabledColumns = (typeof ProvenanceTableConfig !== 'undefined' && ProvenanceTableConfig.enabledColumns) ? ProvenanceTableConfig.enabledColumns : [1, 2, 3, 4];
+        var numColumns = (typeof ProvenanceTableConfig !== 'undefined') ? ProvenanceTableConfig.numColumns : 3;
         var columnNames = (typeof ProvenanceTableConfig !== 'undefined') ? ProvenanceTableConfig.columnNames : {};
         var columnWidths = (typeof ProvenanceTableConfig !== 'undefined') ? ProvenanceTableConfig.columnWidths : {};
 
@@ -110,8 +109,7 @@
         var $thead = $('<thead><tr></tr></thead>');
         // Add empty header for drag handle column
         $thead.find('tr').append('<th style="width: 30px;"></th>');
-        for (var j = 0; j < enabledColumns.length; j++) {
-            var i = enabledColumns[j];
+        for (var i = 1; i <= numColumns; i++) {
             var colName = columnNames[i] || ('Column ' + i);
             var colWidth = columnWidths[i] || 25;
             $thead.find('tr').append('<th style="width: ' + colWidth + '%;">' + colName + '</th>');
@@ -124,8 +122,7 @@
         var $row = $('<tr></tr>');
         // Add drag handle
         $row.append('<td class="drag-handle" style="text-align: center; cursor: move;"><span class="drag-icon">⋮⋮</span></td>');
-        for (var j = 0; j < enabledColumns.length; j++) {
-            var i = enabledColumns[j];
+        for (var i = 1; i <= numColumns; i++) {
             var $td = $('<td></td>');
             var $input = $('<input type="text" class="textinput provenance-col" name="provenance_tables[' + tableCount + '][rows][0][col' + i + ']" value="" />');
             $td.append($input);
@@ -184,8 +181,7 @@
     function addRow($wrapper) {
         var $tbody = $wrapper.find('.provenance-table-body');
         var tableIndex = $wrapper.attr('data-table-index');
-        var numColumns = (typeof ProvenanceTableConfig !== 'undefined') ? ProvenanceTableConfig.numColumns : 4;
-        var enabledColumns = (typeof ProvenanceTableConfig !== 'undefined' && ProvenanceTableConfig.enabledColumns) ? ProvenanceTableConfig.enabledColumns : [1, 2, 3, 4];
+        var numColumns = (typeof ProvenanceTableConfig !== 'undefined') ? ProvenanceTableConfig.numColumns : 3;
 
         // Create new row
         var $newRow = $('<tr></tr>');
@@ -195,9 +191,8 @@
         $dragTd.append('<span class="drag-icon">⋮⋮</span>');
         $newRow.append($dragTd);
 
-        // Add input fields for each enabled column (index will be set by reindexRows)
-        for (var j = 0; j < enabledColumns.length; j++) {
-            var i = enabledColumns[j];
+        // Add input fields for each column (index will be set by reindexRows)
+        for (var i = 1; i <= numColumns; i++) {
             var $td = $('<td></td>');
             var $input = $('<input type="text" class="textinput provenance-col" name="provenance_tables[' + tableIndex + '][rows][0][col' + i + ']" value="" />');
             $td.append($input);
