@@ -304,7 +304,15 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             return;
         }
 
+        // DEBUG: Log raw POST data to find where br tags come from
+        error_log("=== PROVENANCE DEBUG ===");
+        if (isset($post['provenance_tables'][0]['rows'][0]['col1'])) {
+            error_log("RAW POST col1: " . var_export($post['provenance_tables'][0]['rows'][0]['col1'], true));
+        }
+        error_log("========================");
+
         // Store in request registry to save after item is saved
+        // TEMPORARILY NOT STRIPPING - to see what raw POST data contains
         Zend_Registry::set('provenance_data_to_save', array(
             'item_id' => $item->id,
             'data' => $post['provenance_tables']
