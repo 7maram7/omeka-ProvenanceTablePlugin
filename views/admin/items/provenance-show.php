@@ -29,7 +29,11 @@
             <?php if (!empty(trim($tableData['notes']))): ?>
                 <h3>Variety Notes:</h3>
                 <div class="provenance-variety-notes" style="margin-bottom: 10px; padding: 10px; background-color: #f9f9f9; border-left: 3px solid #ddd; white-space: pre-wrap;">
-                    <?php echo nl2br(html_escape($tableData['notes'])); ?>
+                    <?php
+                        // Strip <br> tags and let CSS handle line breaks
+                        $cleanedNotes = preg_replace('/<br\s*\/?\s*>/i', "\n", $tableData['notes']);
+                        echo html_escape($cleanedNotes);
+                    ?>
                 </div>
             <?php endif; ?>
 
