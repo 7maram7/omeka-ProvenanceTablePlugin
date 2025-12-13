@@ -14,7 +14,7 @@
             $tableHasContent = false;
             if (!empty($tableData['rows'])) {
                 foreach ($tableData['rows'] as $row) {
-                    for ($i = 1; $i <= $numColumns; $i++) {
+                    foreach ($enabledColumns as $i) {
                         if (!empty(trim($row['col' . $i]))) {
                             $tableHasContent = true;
                             break 2;
@@ -35,9 +35,9 @@
                 <table>
                     <thead>
                         <tr>
-                            <?php for ($i = 1; $i <= $numColumns; $i++): ?>
+                            <?php foreach ($enabledColumns as $i): ?>
                                 <th style="width: <?php echo $columnWidths[$i]; ?>%;"><?php echo html_escape($columnNames[$i]); ?></th>
-                            <?php endfor; ?>
+                            <?php endforeach; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -46,7 +46,7 @@
                                 <?php
                                 // Skip completely empty rows
                                 $hasContent = false;
-                                for ($i = 1; $i <= $numColumns; $i++) {
+                                foreach ($enabledColumns as $i) {
                                     if (!empty(trim($row['col' . $i]))) {
                                         $hasContent = true;
                                         break;
@@ -55,9 +55,9 @@
                                 if (!$hasContent) continue;
                                 ?>
                                 <tr>
-                                    <?php for ($i = 1; $i <= $numColumns; $i++): ?>
+                                    <?php foreach ($enabledColumns as $i): ?>
                                         <td><?php echo html_escape($row['col' . $i]); ?></td>
-                                    <?php endfor; ?>
+                                    <?php endforeach; ?>
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>

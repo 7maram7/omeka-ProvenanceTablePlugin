@@ -14,6 +14,10 @@ $col1Width = get_option('provenance_col1_width') ?: '5';
 $col2Width = get_option('provenance_col2_width') ?: '30';
 $col3Width = get_option('provenance_col3_width') ?: '15';
 $col4Width = get_option('provenance_col4_width') ?: '30';
+$col1Enabled = get_option('provenance_col1_enabled') !== '0';
+$col2Enabled = get_option('provenance_col2_enabled') !== '0';
+$col3Enabled = get_option('provenance_col3_enabled') !== '0';
+$col4Enabled = get_option('provenance_col4_enabled') !== '0';
 $enabledItemTypes = get_option('provenance_enabled_item_types') ?: 'all';
 
 // Get all item types
@@ -29,19 +33,15 @@ $itemTypes = get_db()->getTable('ItemType')->findAll();
     </div>
 </div>
 
-<div class="field">
-    <label for="provenance_num_columns">Number of Columns</label>
-    <div class="inputs">
-        <select name="provenance_num_columns" id="provenance_num_columns" class="textinput">
-            <option value="2" <?php echo ($numColumns == 2) ? 'selected' : ''; ?>>2 Columns</option>
-            <option value="3" <?php echo ($numColumns == 3) ? 'selected' : ''; ?>>3 Columns</option>
-            <option value="4" <?php echo ($numColumns == 4) ? 'selected' : ''; ?>>4 Columns</option>
-        </select>
-        <p class="explanation">How many columns should the table have?</p>
-    </div>
-</div>
-
 <h2>Column Settings</h2>
+<p class="explanation">Choose which columns to display and configure their names and widths. You can enable/disable individual columns.</p>
+
+<div class="field">
+    <label>
+        <input type="checkbox" name="provenance_col1_enabled" value="1" <?php echo $col1Enabled ? 'checked' : ''; ?> />
+        <strong>Enable Column 1</strong>
+    </label>
+</div>
 
 <div class="field">
     <label for="provenance_col1_name">Column 1 Name</label>
@@ -58,6 +58,15 @@ $itemTypes = get_db()->getTable('ItemType')->findAll();
                value="<?php echo html_escape($col1Width); ?>" class="textinput" size="5" min="1" max="100" />
         <p class="explanation">Width as percentage (e.g., 5 for a narrow column, 30 for wider)</p>
     </div>
+</div>
+
+<hr style="margin: 20px 0;" />
+
+<div class="field">
+    <label>
+        <input type="checkbox" name="provenance_col2_enabled" value="1" <?php echo $col2Enabled ? 'checked' : ''; ?> />
+        <strong>Enable Column 2</strong>
+    </label>
 </div>
 
 <div class="field">
@@ -77,6 +86,15 @@ $itemTypes = get_db()->getTable('ItemType')->findAll();
     </div>
 </div>
 
+<hr style="margin: 20px 0;" />
+
+<div class="field">
+    <label>
+        <input type="checkbox" name="provenance_col3_enabled" value="1" <?php echo $col3Enabled ? 'checked' : ''; ?> />
+        <strong>Enable Column 3</strong>
+    </label>
+</div>
+
 <div class="field">
     <label for="provenance_col3_name">Column 3 Name</label>
     <div class="inputs">
@@ -94,12 +112,20 @@ $itemTypes = get_db()->getTable('ItemType')->findAll();
     </div>
 </div>
 
+<hr style="margin: 20px 0;" />
+
+<div class="field">
+    <label>
+        <input type="checkbox" name="provenance_col4_enabled" value="1" <?php echo $col4Enabled ? 'checked' : ''; ?> />
+        <strong>Enable Column 4</strong>
+    </label>
+</div>
+
 <div class="field">
     <label for="provenance_col4_name">Column 4 Name</label>
     <div class="inputs">
         <input type="text" name="provenance_col4_name" id="provenance_col4_name"
                value="<?php echo html_escape($col4Name); ?>" class="textinput" size="30" />
-        <p class="explanation">Only shown if "4 Columns" is selected above</p>
     </div>
 </div>
 
