@@ -27,7 +27,7 @@
 
             <div class="provenance-table-section" style="margin-bottom: 30px;">
                 <?php if (!empty(trim($tableData['notes']))): ?>
-                    <div class="provenance-variety-notes" style="margin-bottom: 10px; white-space: pre-wrap;">
+                    <div class="provenance-variety-notes" style="margin-bottom: 10px; white-space: pre-wrap; line-height: 1.2;">
                         <?php
                             // Strip <br> tags and let CSS handle line breaks
                             $cleanedNotes = preg_replace('/<br\s*\/?\s*>/i', "\n", $tableData['notes']);
@@ -60,7 +60,7 @@
                                 ?>
                                 <tr>
                                     <?php for ($i = 1; $i <= 3; $i++): ?>
-                                        <td style="white-space: pre-wrap;"><?php
+                                        <td style="white-space: pre-wrap; line-height: 1.2;"><?php
                                             // Strip all variations of <br> tags and convert to newlines
                                             $cleanedText = preg_replace('/<br\s*\/?\s*>/i', "\n", $row['col' . $i]);
                                             echo html_escape($cleanedText);
