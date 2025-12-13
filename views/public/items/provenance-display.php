@@ -56,7 +56,11 @@
                                 ?>
                                 <tr>
                                     <?php for ($i = 1; $i <= 3; $i++): ?>
-                                        <td style="white-space: pre-wrap;"><?php echo html_escape($row['col' . $i]); ?></td>
+                                        <td style="white-space: pre-wrap;"><?php
+                                            // Strip all variations of <br> tags and convert to newlines
+                                            $cleanedText = preg_replace('/<br\s*\/?\s*>/i', "\n", $row['col' . $i]);
+                                            echo html_escape($cleanedText);
+                                        ?></td>
                                     <?php endfor; ?>
                                 </tr>
                             <?php endforeach; ?>
