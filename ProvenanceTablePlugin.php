@@ -499,10 +499,10 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             $tableOrder = 0;
 
             foreach ($data as $tableData) {
-                // Create table entry
-                // Strip any <br> tags that might have been added by form processing
+                // Create table entry - strip ALL forms of br tags
                 $notes = isset($tableData['notes']) ? trim($tableData['notes']) : '';
-                $notes = preg_replace('/<br\s*\/?\s*>/i', "\n", $notes);
+                $notes = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $notes); // HTML escaped
+                $notes = preg_replace('/<br\s*\/?\s*>/i', "\n", $notes); // Literal tags
                 $sql = "INSERT INTO {$db->prefix}provenance_tables
                         (item_id, table_order, notes)
                         VALUES (?, ?, ?)";
@@ -524,11 +524,16 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
                         }
 
                         if ($hasData) {
-                            // Strip any <br> tags from column data before saving
+                            // Strip ALL forms of br tags from column data before saving
                             $col1 = isset($row['col1']) ? trim($row['col1']) : '';
                             $col2 = isset($row['col2']) ? trim($row['col2']) : '';
                             $col3 = isset($row['col3']) ? trim($row['col3']) : '';
 
+                            // Strip HTML escaped br tags
+                            $col1 = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $col1);
+                            $col2 = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $col2);
+                            $col3 = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $col3);
+                            // Strip literal br tags
                             $col1 = preg_replace('/<br\s*\/?\s*>/i', "\n", $col1);
                             $col2 = preg_replace('/<br\s*\/?\s*>/i', "\n", $col2);
                             $col3 = preg_replace('/<br\s*\/?\s*>/i', "\n", $col3);
