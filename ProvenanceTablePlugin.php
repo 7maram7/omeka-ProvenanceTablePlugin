@@ -117,6 +117,10 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         delete_option('provenance_col2_width');
         delete_option('provenance_col3_width');
         delete_option('provenance_col4_width');
+        delete_option('provenance_col1_enabled');
+        delete_option('provenance_col2_enabled');
+        delete_option('provenance_col3_enabled');
+        delete_option('provenance_col4_enabled');
         delete_option('provenance_enabled_item_types');
     }
 
@@ -179,6 +183,14 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
                             WHERE item_id = ?";
                     $db->query($sql, array($tableId, $itemId));
                 }
+            }
+
+            // Initialize column enabled settings if they don't exist
+            if (get_option('provenance_col1_enabled') === null) {
+                set_option('provenance_col1_enabled', '1');
+                set_option('provenance_col2_enabled', '1');
+                set_option('provenance_col3_enabled', '0'); // Disabled by default
+                set_option('provenance_col4_enabled', '1');
             }
         }
     }
