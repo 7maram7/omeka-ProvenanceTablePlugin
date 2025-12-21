@@ -27,10 +27,12 @@
 
             <div class="provenance-table-section" style="margin-bottom: 30px;">
                 <?php if (!empty(trim($tableData['notes']))): ?>
-                    <div class="provenance-variety-notes" style="margin-bottom: 10px; white-space: pre-wrap; line-height: 1.0;">
+                    <div class="provenance-variety-notes pt-multiline">
                         <?php
-                            // Strip <br> tags and let CSS handle line breaks
-                            $cleanedNotes = preg_replace('/<br\s*\/?\s*>/i', "\n", $tableData['notes']);
+                            // Normalize any injected <br> tags and collapse accidental blank lines
+                            $cleanedNotes = preg_replace('/<br\s*\/?\s*>/i', "\n", (string) $tableData['notes']);
+                            $cleanedNotes = str_replace(array("\r\n", "\r"), "\n", $cleanedNotes);
+                            $cleanedNotes = preg_replace("/\n[ \t]*\n+/", "\n", $cleanedNotes);
                             echo html_escape($cleanedNotes);
                         ?>
                     </div>
@@ -60,9 +62,11 @@
                                 ?>
                                 <tr>
                                     <?php for ($i = 1; $i <= 3; $i++): ?>
-                                        <td style="white-space: pre-wrap; line-height: 1.0;"><?php
-                                            // Strip all variations of <br> tags and convert to newlines
-                                            $cleanedText = preg_replace('/<br\s*\/?\s*>/i', "\n", $row['col' . $i]);
+                                        <td class="pt-multiline"><?php
+                                            // Normalize any injected <br> tags and collapse accidental blank lines
+                                            $cleanedText = preg_replace('/<br\s*\/?\s*>/i', "\n", (string) $row['col' . $i]);
+                                            $cleanedText = str_replace(array("\r\n", "\r"), "\n", $cleanedText);
+                                            $cleanedText = preg_replace("/\n[ \t]*\n+/", "\n", $cleanedText);
                                             echo html_escape($cleanedText);
                                         ?></td>
                                     <?php endfor; ?>
