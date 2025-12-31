@@ -14,18 +14,7 @@
                     <textarea name="provenance_tables[<?php echo $tableIndex; ?>][notes]"
                               class="provenance-notes textinput"
                               rows="3"
-                              style="width: 100%;"><?php
-                        // Strip br tags and rebuild without blank lines
-                        $notes = $tableData['notes'];
-                        $notes = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $notes);
-                        $notes = preg_replace('/<br\s*\/?\s*>/i', "\n", $notes);
-                        $notes = str_replace(array("\r\n", "\r"), "\n", $notes);
-                        // Split into lines, remove empty lines, rejoin
-                        $lines = explode("\n", $notes);
-                        $lines = array_map('trim', $lines);
-                        $lines = array_filter($lines, function($line) { return $line !== ''; });
-                        echo html_escape(implode("\n", $lines));
-                    ?></textarea>
+                              style="width: 100%;"><?php echo html_escape($tableData['notes']); ?></textarea>
                 </div>
 
                 <table class="provenance-table">
@@ -49,18 +38,7 @@
                                         <td>
                                             <textarea class="textinput provenance-col"
                                                       name="provenance_tables[<?php echo $tableIndex; ?>][rows][<?php echo $rowIndex; ?>][col<?php echo $i; ?>]"
-                                                      rows="2"><?php
-                                                // Strip br tags and rebuild without blank lines
-                                                $text = $row['col' . $i];
-                                                $text = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $text);
-                                                $text = preg_replace('/<br\s*\/?\s*>/i', "\n", $text);
-                                                $text = str_replace(array("\r\n", "\r"), "\n", $text);
-                                                // Split into lines, remove empty lines, rejoin
-                                                $lines = explode("\n", $text);
-                                                $lines = array_map('trim', $lines);
-                                                $lines = array_filter($lines, function($line) { return $line !== ''; });
-                                                echo html_escape(implode("\n", $lines));
-                                            ?></textarea>
+                                                      rows="2"><?php echo html_escape($row['col' . $i]); ?></textarea>
                                         </td>
                                     <?php endfor; ?>
                                     <td style="text-align: center;">
