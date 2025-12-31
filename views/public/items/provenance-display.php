@@ -27,12 +27,13 @@
 
             <div class="provenance-table-section" style="margin-bottom: 30px;">
                 <?php if (!empty(trim($tableData['notes']))): ?>
-                    <div class="provenance-variety-notes" style="margin-bottom: 10px; white-space: pre-wrap; line-height: 1.0;">
+                    <div class="provenance-variety-notes" style="margin-bottom: 10px; white-space: pre-line; line-height: 1.0;">
                         <?php
                             // Strip <br> tags and collapse multiple newlines into single newlines
                             $cleanedNotes = preg_replace('/<br\s*\/?\s*>/i', "\n", $tableData['notes']);
                             $cleanedNotes = str_replace(array("\r\n", "\r"), "\n", $cleanedNotes);
-                            $cleanedNotes = preg_replace("/\n[ \t]*\n+/", "\n", $cleanedNotes);
+                            // Collapse any multiple consecutive newlines (with or without spaces) into single newline
+                            $cleanedNotes = preg_replace("/\n\s*\n+/", "\n", $cleanedNotes);
                             echo html_escape($cleanedNotes);
                         ?>
                     </div>
@@ -62,11 +63,12 @@
                                 ?>
                                 <tr>
                                     <?php for ($i = 1; $i <= 3; $i++): ?>
-                                        <td style="white-space: pre-wrap; line-height: 1.0;"><?php
+                                        <td style="white-space: pre-line; line-height: 1.0;"><?php
                                             // Strip <br> tags and collapse multiple newlines into single newlines
                                             $cleanedText = preg_replace('/<br\s*\/?\s*>/i', "\n", $row['col' . $i]);
                                             $cleanedText = str_replace(array("\r\n", "\r"), "\n", $cleanedText);
-                                            $cleanedText = preg_replace("/\n[ \t]*\n+/", "\n", $cleanedText);
+                                            // Collapse any multiple consecutive newlines (with or without spaces) into single newline
+                                            $cleanedText = preg_replace("/\n\s*\n+/", "\n", $cleanedText);
                                             echo html_escape($cleanedText);
                                         ?></td>
                                     <?php endfor; ?>
