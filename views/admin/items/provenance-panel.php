@@ -21,6 +21,10 @@
                         $notes = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $notes);
                         // Strip literal br tags
                         $notes = preg_replace('/<br\s*\/?\s*>/i', "\n", $notes);
+                        // Normalize line endings
+                        $notes = str_replace(array("\r\n", "\r"), "\n", $notes);
+                        // Collapse multiple consecutive newlines into single newlines
+                        $notes = preg_replace("/\n\s*\n+/", "\n", $notes);
                         echo html_escape($notes);
                     ?></textarea>
                 </div>
@@ -53,6 +57,10 @@
                                                 $text = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $text);
                                                 // Strip literal br tags
                                                 $text = preg_replace('/<br\s*\/?\s*>/i', "\n", $text);
+                                                // Normalize line endings
+                                                $text = str_replace(array("\r\n", "\r"), "\n", $text);
+                                                // Collapse multiple consecutive newlines into single newlines
+                                                $text = preg_replace("/\n\s*\n+/", "\n", $text);
                                                 echo html_escape($text);
                                             ?></textarea>
                                         </td>
