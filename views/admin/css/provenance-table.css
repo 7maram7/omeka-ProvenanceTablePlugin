@@ -31,20 +31,22 @@
     vertical-align: middle;
 }
 
-/* Textarea Fields - Match Omeka defaults, no border since table has borders */
-.provenance-table textarea.provenance-col {
-    width: 100%;
-    padding: 0;
-    margin: 0;
-    border: none;
+/* Textarea Fields - Override Omeka defaults completely */
+.provenance-table textarea.provenance-col,
+.provenance-table textarea.provenance-notes {
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
     font-size: 13px;
     font-family: inherit;
-    box-sizing: border-box;
+    box-sizing: border-box !important;
     resize: vertical;
     overflow-y: auto;
     min-height: 20px;
-    display: block;
-    vertical-align: top;
+    display: block !important;
+    vertical-align: top !important;
+    line-height: normal !important;
 }
 
 .provenance-table textarea.provenance-col:focus {
