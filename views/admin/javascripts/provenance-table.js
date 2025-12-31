@@ -19,8 +19,8 @@
             return;
         }
 
-        // Initialize drag and drop for existing tables
-        initializeSortable();
+        // Drag and drop disabled for testing
+        // initializeSortable();
 
         // Bind add table button
         $(document).on('click', '.add-provenance-table', function(e) {
@@ -143,7 +143,7 @@
         $container.append($newWrapper);
 
         reindexTables();
-        initializeSortable();
+        // initializeSortable(); // Disabled for testing
 
         $newWrapper.find('textarea').first().focus();
     }
