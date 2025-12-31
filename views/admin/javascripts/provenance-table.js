@@ -5,10 +5,158 @@
 
 (function($) {
     'use strict';
+    var ptFixCount = 0;
 
     $(document).ready(function() {
+        ptInstallValInterceptor();
         initProvenanceTables();
     });
+
+    /**
+     * Aggressively normalize textarea values.
+     * Your DB + POST are clean; this means something in the admin UI is injecting <br />
+     * after the page renders. So we normalize on load, on focus/typing, on tab clicks,
+     * and periodically for a few seconds to catch delayed scripts.
+     */
+    function ptNormalizeValue(v) {
+        if (!v) return v;
+
+        // Literal <br> variants
+        v = v.replace(/<br\b[^>]*>/gi, "\n");
+
+        // Encoded variants
+        v = v.replace(/&lt;br\b[^&]*&gt;/gi, "\n");
+        v = v.replace(/&amp;lt;br\b[^&]*&amp;gt;/gi, "\n");
+
+        // Normalize newlines
+        v = v.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+        return v;
+    }
+
+    /**
+     * Intercept BOTH jQuery .val(...) and native textarea.value setters
+     * for textareas inside #provenance-tables-container.
+     */
+    function ptInstallValInterceptor() {
+        if ($.fn.__ptValInterceptorInstalled) return;
+        $.fn.__ptValInterceptorInstalled = true;
+
+        // --- jQuery .val(...) interceptor (only catches scripts using jQuery) ---
+        var _val = $.fn.val;
+        $.fn.val = function(value) {
+            // Getter
+            if (arguments.length === 0) {
+                return _val.call(this);
+            }
+
+            // Support val(function)
+            if (typeof value === 'function') {
+                return _val.call(this, value);
+            }
+
+            // Only normalize when setting a string into a textarea inside our container
+            if (typeof value === 'string') {
+                var shouldNormalize = false;
+
+                this.each(function() {
+                    if (!this || !this.tagName) return;
+                    if (this.tagName.toLowerCase() !== 'textarea') return;
+                    if ($(this).closest('#provenance-tables-container').length) {
+                        shouldNormalize = true;
+                    }
+                });
+
+                if (shouldNormalize) {
+                    value = ptNormalizeValue(value);
+                }
+            }
+
+            return _val.call(this, value);
+        };
+
+        // --- Native textarea.value interceptor (catches direct assignments) ---
+        try {
+            if (!HTMLTextAreaElement.prototype.__ptValuePatched) {
+                HTMLTextAreaElement.prototype.__ptValuePatched = true;
+
+                var desc = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
+                if (desc && typeof desc.get === 'function' && typeof desc.set === 'function') {
+                    Object.defineProperty(HTMLTextAreaElement.prototype, 'value', {
+                        configurable: true,
+                        enumerable: desc.enumerable,
+                        get: function() {
+                            return desc.get.call(this);
+                        },
+                        set: function(v) {
+                            if (typeof v === 'string' && $(this).closest('#provenance-tables-container').length) {
+                                v = ptNormalizeValue(v);
+                            }
+                            return desc.set.call(this, v);
+                        }
+                    });
+                }
+            }
+        } catch (e) {
+            // If this fails in some browsers, timer-based fix still helps.
+        }
+    }
+
+    function ptFixOneTextarea(el) {
+        var $t = $(el);
+        var v = $t.val();
+        if (!v) return;
+
+        var nv = ptNormalizeValue(v);
+        if (nv !== v) {
+            ptFixCount++;
+            $t.val(nv);
+        }
+    }
+
+    function ptFixAllTextareas(scope) {
+        var $root = scope ? $(scope) : $('#provenance-tables-container');
+        $root.find('textarea.provenance-col, textarea.provenance-notes').each(function() {
+            ptFixOneTextarea(this);
+        });
+    }
+
+    function ptBindAntiBrGuards() {
+        // Fix immediately
+        ptFixAllTextareas('#provenance-tables-container');
+
+        // Fix on focus/typing/paste/change (catches scripts that rewrite on focus)
+        $(document).on('focusin input change keyup paste', 'textarea.provenance-col, textarea.provenance-notes', function() {
+            ptFixOneTextarea(this);
+        });
+
+        // Fix right before submitting the item form
+        var $form = $('#provenance-tables-container').closest('form');
+        if ($form.length) {
+            $form.on('submit', function() {
+                ptFixAllTextareas('#provenance-tables-container');
+            });
+        }
+
+        // Fix when switching tabs / clicking anchors (Omeka uses various tab UIs)
+        $(document).on('click', '.tabs a, .ui-tabs-nav a, #section-nav a, a[href^="#"]', function() {
+            setTimeout(function() {
+                ptFixAllTextareas('#provenance-tables-container');
+            }, 50);
+            setTimeout(function() {
+                ptFixAllTextareas('#provenance-tables-container');
+            }, 250);
+        });
+
+        // Last resort: keep fixing while the container exists (catches delayed editors)
+        var timer = setInterval(function() {
+            if (!$('#provenance-tables-container').length) {
+                clearInterval(timer);
+                return;
+            }
+            ptFixAllTextareas('#provenance-tables-container');
+        }, 500);
+    }
 
     /**
      * Initialize provenance tables
@@ -19,6 +167,9 @@
             return;
         }
 
+        // Aggressive guards against <br /> being injected into textarea values by other admin scripts
+        ptBindAntiBrGuards();
+
         // Initialize drag and drop for existing tables
         initializeSortable();
 
@@ -26,6 +177,7 @@
         $(document).on('click', '.add-provenance-table', function(e) {
             e.preventDefault();
             addTable();
+            ptFixAllTextareas('#provenance-tables-container');
         });
 
         // Bind delete table buttons
@@ -39,6 +191,7 @@
             e.preventDefault();
             var $wrapper = $(this).closest('.provenance-table-wrapper');
             addRow($wrapper);
+            ptFixAllTextareas($wrapper);
         });
 
         // Bind delete row buttons
@@ -96,10 +249,10 @@
         // Create new table wrapper
         var $newWrapper = $('<div class="provenance-table-wrapper" data-table-index="' + tableCount + '"></div>');
 
-        // Add notes textarea
+        // Add notes textarea (NO textinput)
         var $header = $('<div class="provenance-table-header"></div>');
         $header.append('<label>Variety Notes:</label>');
-        $header.append('<textarea name="provenance_tables[' + tableCount + '][notes]" class="provenance-notes textinput" rows="3" style="width: 100%;"></textarea>');
+        $header.append('<textarea name="provenance_tables[' + tableCount + '][notes]" class="provenance-notes" rows="3" style="width: 100%;"></textarea>');
         $newWrapper.append($header);
 
         // Create table
@@ -107,7 +260,6 @@
 
         // Add header
         var $thead = $('<thead><tr></tr></thead>');
-        // Add empty header for drag handle column
         $thead.find('tr').append('<th style="width: 30px;"></th>');
         for (var i = 1; i <= numColumns; i++) {
             var colName = columnNames[i] || ('Column ' + i);
@@ -120,11 +272,11 @@
         // Add body with one empty row
         var $tbody = $('<tbody class="provenance-table-body"></tbody>');
         var $row = $('<tr></tr>');
-        // Add drag handle
         $row.append('<td class="drag-handle" style="text-align: center; cursor: move;"><span class="drag-icon">⋮⋮</span></td>');
-        for (var i = 1; i <= numColumns; i++) {
+        for (var j = 1; j <= numColumns; j++) {
             var $td = $('<td></td>');
-            var $textarea = $('<textarea class="textinput provenance-col" name="provenance_tables[' + tableCount + '][rows][0][col' + i + ']" rows="2"></textarea>');
+            // NO textinput
+            var $textarea = $('<textarea class="provenance-col" name="provenance_tables[' + tableCount + '][rows][0][col' + j + ']" rows="2"></textarea>');
             $td.append($textarea);
             $row.append($td);
         }
@@ -140,19 +292,13 @@
         $buttons.append('<button type="button" class="button delete-provenance-table" style="margin-left: 10px;">Delete Table</button>');
         $newWrapper.append($buttons);
 
-        // Add separator
         $newWrapper.append('<hr style="margin: 20px 0; border: 1px solid #ccc;">');
 
-        // Append to container
         $container.append($newWrapper);
 
-        // Re-index all tables
         reindexTables();
-
-        // Initialize sortable on the new table
         initializeSortable();
 
-        // Focus on notes field
         $newWrapper.find('textarea').first().focus();
     }
 
@@ -170,7 +316,6 @@
 
         if (confirm('Are you sure you want to delete this entire table?')) {
             $button.closest('.provenance-table-wrapper').remove();
-            // Re-index all tables after deletion
             reindexTables();
         }
     }
@@ -183,35 +328,29 @@
         var tableIndex = $wrapper.attr('data-table-index');
         var numColumns = (typeof ProvenanceTableConfig !== 'undefined') ? ProvenanceTableConfig.numColumns : 3;
 
-        // Create new row
         var $newRow = $('<tr></tr>');
 
-        // Add drag handle
         var $dragTd = $('<td class="drag-handle" style="text-align: center; cursor: move;"></td>');
         $dragTd.append('<span class="drag-icon">⋮⋮</span>');
         $newRow.append($dragTd);
 
-        // Add textarea fields for each column (index will be set by reindexRows)
         for (var i = 1; i <= numColumns; i++) {
             var $td = $('<td></td>');
-            var $textarea = $('<textarea class="textinput provenance-col" name="provenance_tables[' + tableIndex + '][rows][0][col' + i + ']" rows="2"></textarea>');
+            // NO textinput
+            var $textarea = $('<textarea class="provenance-col" name="provenance_tables[' + tableIndex + '][rows][0][col' + i + ']" rows="2"></textarea>');
             $td.append($textarea);
             $newRow.append($td);
         }
 
-        // Add delete button
         var $actionTd = $('<td style="text-align: center;"></td>');
         var $deleteBtn = $('<button type="button" class="button delete-provenance-row">Delete Row</button>');
         $actionTd.append($deleteBtn);
         $newRow.append($actionTd);
 
-        // Prepend to table (add at top)
         $tbody.prepend($newRow);
 
-        // Re-index rows in this table
         reindexRowsInTable($wrapper);
 
-        // Focus on first textarea of new row
         $newRow.find('textarea').first().focus();
     }
 
@@ -230,7 +369,6 @@
 
         if (confirm('Are you sure you want to delete this row?')) {
             $button.closest('tr').remove();
-            // Re-index rows in this table after deletion
             reindexRowsInTable($wrapper);
         }
     }
@@ -243,10 +381,8 @@
             var $wrapper = $(this);
             $wrapper.attr('data-table-index', tableIndex);
 
-            // Update notes textarea name
             $wrapper.find('.provenance-notes').attr('name', 'provenance_tables[' + tableIndex + '][notes]');
 
-            // Update delete table button visibility
             var tableCount = $('#provenance-tables-container .provenance-table-wrapper').length;
             var $deleteBtn = $wrapper.find('.delete-provenance-table');
             if (tableCount <= 1) {
@@ -255,7 +391,6 @@
                 $wrapper.find('.add-provenance-row').after('<button type="button" class="button delete-provenance-table" style="margin-left: 10px;">Delete Table</button>');
             }
 
-            // Re-index rows
             reindexRowsInTable($wrapper);
         });
     }
@@ -268,7 +403,6 @@
         $wrapper.find('.provenance-table-body tr').each(function(rowIndex) {
             $(this).find('textarea.provenance-col').each(function() {
                 var name = $(this).attr('name');
-                // Replace with correct table and row index
                 var match = name.match(/col(\d+)/);
                 if (match) {
                     var colNum = match[1];
