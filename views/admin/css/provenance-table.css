@@ -34,7 +34,7 @@
 /* Textarea Fields - Match Omeka defaults, no border since table has borders */
 .provenance-table textarea.provenance-col {
     width: 100%;
-    padding: 6px;
+    padding: 4px;
     margin: 0;
     border: none;
     font-size: 13px;
