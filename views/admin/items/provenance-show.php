@@ -30,8 +30,7 @@
                 <h3>Variety Notes:</h3>
                 <div class="provenance-variety-notes" style="margin-bottom: 10px; padding: 10px; background-color: #f9f9f9; border-left: 3px solid #ddd; white-space: pre-wrap; line-height: 1.0;">
                     <?php
-                        // Strip <br> tags and let CSS handle line breaks
-                        $cleanedNotes = preg_replace('/<br\s*\/?\s*>/i', "\n", $tableData['notes']);
+                        $cleanedNotes = ProvenanceTablePlugin::normalizeMultiline($tableData['notes']);
                         echo html_escape($cleanedNotes);
                     ?>
                 </div>
@@ -62,8 +61,7 @@
                             <tr>
                                 <?php for ($i = 1; $i <= 3; $i++): ?>
                                     <td style="white-space: pre-wrap; line-height: 1.0;"><?php
-                                        // Strip all variations of <br> tags and convert to newlines
-                                        $cleanedText = preg_replace('/<br\s*\/?\s*>/i', "\n", $row['col' . $i]);
+                                        $cleanedText = ProvenanceTablePlugin::normalizeMultiline($row['col' . $i]);
                                         echo html_escape($cleanedText);
                                     ?></td>
                                 <?php endfor; ?>

@@ -37,6 +37,68 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         'admin_items_form_tabs',
     );
 
+    /**
+     * Echo an HTML comment with the MD5 hash of a plugin asset so operators can
+     * confirm which file Omeka is serving (useful when stale copies are cached
+     * elsewhere in the stack).
+     */
+    protected function _emitAssetHashComment($relativePath, $label)
+    {
+        $fullPath = dirname(__FILE__) . '/' . ltrim($relativePath, '/');
+        if (!is_readable($fullPath)) {
+            return;
+        }
+
+        $hash = md5_file($fullPath);
+        echo "<!-- ProvenanceTable {$label} hash: {$hash} ({$relativePath}) -->\n";
+    }
+
+    /**
+     * Normalize multiline text by decoding entities, converting HTML breaks to real
+     * newlines, removing invisible characters, and collapsing whitespace-only
+     * lines so cells render without stray blank rows.
+     */
+    public static function normalizeMultiline($value)
+    {
+        if ($value === null) {
+            return '';
+        }
+
+        $value = (string)$value;
+
+        // Decode entities twice to catch double-encoded input (including &nbsp;)
+        $value = html_entity_decode($value, ENT_QUOTES, 'UTF-8');
+        $value = html_entity_decode($value, ENT_QUOTES, 'UTF-8');
+
+        // Convert HTML line breaks and normalize all newline variants
+        $value = preg_replace('~<br\s*/?\s*>~i', "\n", $value);
+        $value = str_replace(array("\r\n", "\r"), "\n", $value);
+        $value = preg_replace('~[\x{2028}\x{2029}\x{0085}]~u', "\n", $value);
+
+        // Remove BOM, zero-width characters, and NBSP (replace with regular space)
+        $value = preg_replace('~^\xEF\xBB\xBF~u', '', $value);
+        $value = preg_replace('~[\x{200B}-\x{200D}\x{2060}\x{FEFF}]~u', '', $value);
+        $value = preg_replace('~\x{00A0}~u', ' ', $value);
+
+        // Drop whitespace-only lines and collapse spacing
+        $lines = preg_split('/\n+/', $value);
+        $cleanLines = array();
+
+        foreach ($lines as $line) {
+            $line = preg_replace('~[\x{200B}-\x{200D}\x{2060}\x{FEFF}]~u', '', $line);
+            $line = str_replace("\xC2\xA0", ' ', $line);
+            $line = trim($line);
+
+            if ($line === '') {
+                continue;
+            }
+
+            $cleanLines[] = $line;
+        }
+
+        return implode("\n", $cleanLines);
+    }
+
 
     /**
      * Install the plugin.
@@ -344,6 +406,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         if ($controller == 'items' && ($action == 'add' || $action == 'edit' || $action == 'show')) {
             queue_css_file('provenance-table');
             queue_js_file('provenance-table');
+            $this->_emitAssetHashComment('views/admin/javascripts/provenance-table.js', 'admin JS');
         }
     }
 
@@ -395,6 +458,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
 
         if ($controller == 'items' && $action == 'show') {
             queue_js_file('provenance-reposition');
+            $this->_emitAssetHashComment('views/public/javascripts/provenance-reposition.js', 'public JS');
         }
     }
 
@@ -505,8 +569,8 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
 
             foreach ($data as $tableData) {
                 // Notes
-                $notes = isset($tableData['notes']) ? trim($tableData['notes']) : '';
-                $notes = (string)$notes;
+                $notes = isset($tableData['notes']) ? $tableData['notes'] : '';
+                $notes = self::normalizeMultiline($notes);
 
                 $sql = "INSERT INTO {$db->prefix}provenance_tables
                         (item_id, table_order, notes)
@@ -520,9 +584,9 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
 
                     foreach ($tableData['rows'] as $row) {
                         // Normalize cols
-                        $col1 = isset($row['col1']) ? (string)$row['col1'] : '';
-                        $col2 = isset($row['col2']) ? (string)$row['col2'] : '';
-                        $col3 = isset($row['col3']) ? (string)$row['col3'] : '';
+                        $col1 = isset($row['col1']) ? self::normalizeMultiline($row['col1']) : '';
+                        $col2 = isset($row['col2']) ? self::normalizeMultiline($row['col2']) : '';
+                        $col3 = isset($row['col3']) ? self::normalizeMultiline($row['col3']) : '';
 
                         // Only save rows that have data
                         if (trim($col1) === '' && trim($col2) === '' && trim($col3) === '') {

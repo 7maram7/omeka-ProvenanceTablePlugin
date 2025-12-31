@@ -32,11 +32,8 @@ function provenance_table_textarea_value($value)
     $value = html_entity_decode($value, ENT_QUOTES, 'UTF-8');
     $value = html_entity_decode($value, ENT_QUOTES, 'UTF-8');
 
-    // Convert any <br ...> to newline
-    $value = preg_replace('~<br\b[^>]*>~i', "\n", $value);
-
-    // Normalize CRLF/CR
-    $value = str_replace(array("\r\n", "\r"), "\n", $value);
+    // Convert any <br ...> to newline then normalize and strip invisible characters
+    $value = ProvenanceTablePlugin::normalizeMultiline($value);
 
     return $value;
 }

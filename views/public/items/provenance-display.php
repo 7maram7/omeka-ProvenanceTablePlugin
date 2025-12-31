@@ -29,10 +29,7 @@
                 <?php if (!empty(trim($tableData['notes']))): ?>
                     <div class="provenance-variety-notes pt-multiline">
                         <?php
-                            // Normalize any injected <br> tags and collapse accidental blank lines
-                            $cleanedNotes = preg_replace('/<br\s*\/?\s*>/i', "\n", (string) $tableData['notes']);
-                            $cleanedNotes = str_replace(array("\r\n", "\r"), "\n", $cleanedNotes);
-                            $cleanedNotes = preg_replace("/\n[ \t]*\n+/", "\n", $cleanedNotes);
+                            $cleanedNotes = ProvenanceTablePlugin::normalizeMultiline($tableData['notes']);
                             echo html_escape($cleanedNotes);
                         ?>
                     </div>
@@ -63,10 +60,7 @@
                                 <tr>
                                     <?php for ($i = 1; $i <= 3; $i++): ?>
                                         <td class="pt-multiline"><?php
-                                            // Normalize any injected <br> tags and collapse accidental blank lines
-                                            $cleanedText = preg_replace('/<br\s*\/?\s*>/i', "\n", (string) $row['col' . $i]);
-                                            $cleanedText = str_replace(array("\r\n", "\r"), "\n", $cleanedText);
-                                            $cleanedText = preg_replace("/\n[ \t]*\n+/", "\n", $cleanedText);
+                                            $cleanedText = ProvenanceTablePlugin::normalizeMultiline($row['col' . $i]);
                                             echo html_escape($cleanedText);
                                         ?></td>
                                     <?php endfor; ?>
