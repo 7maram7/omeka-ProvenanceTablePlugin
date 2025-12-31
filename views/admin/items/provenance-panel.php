@@ -80,10 +80,7 @@ function provenance_table_textarea_value($value)
                                     </td>
 
                                     <?php for ($i = 1; $i <= 3; $i++): ?>
-                                        <td>
-                                            <textarea class="provenance-col"
-                                                      name="provenance_tables[<?php echo $tableIndex; ?>][rows][<?php echo $rowIndex; ?>][col<?php echo $i; ?>]"
-                                                      rows="1"><?php
+                                        <td><textarea class="provenance-col" name="provenance_tables[<?php echo $tableIndex; ?>][rows][<?php echo $rowIndex; ?>][col<?php echo $i; ?>]" rows="1"><?php
                                                 $key  = 'col' . $i;
                                                 $text = isset($row[$key]) ? $row[$key] : '';
 
@@ -99,8 +96,7 @@ function provenance_table_textarea_value($value)
                                                 }
 
                                                 echo html_escape($textNorm);
-                                            ?></textarea>
-                                        </td>
+                                            ?></textarea></td>
                                     <?php endfor; ?>
 
                                     <td style="text-align: center;">
@@ -114,11 +110,7 @@ function provenance_table_textarea_value($value)
                                     <span class="drag-icon">⋮⋮</span>
                                 </td>
                                 <?php for ($i = 1; $i <= 3; $i++): ?>
-                                    <td>
-                                        <textarea class="provenance-col"
-                                                  name="provenance_tables[<?php echo $tableIndex; ?>][rows][0][col<?php echo $i; ?>]"
-                                                  rows="1"></textarea>
-                                    </td>
+                                    <td><textarea class="provenance-col" name="provenance_tables[<?php echo $tableIndex; ?>][rows][0][col<?php echo $i; ?>]" rows="1"></textarea></td>
                                 <?php endfor; ?>
                                 <td style="text-align: center;">
                                     <button type="button" class="button delete-provenance-row">Delete Row</button>
@@ -164,11 +156,7 @@ function provenance_table_textarea_value($value)
                             <span class="drag-icon">⋮⋮</span>
                         </td>
                         <?php for ($i = 1; $i <= 3; $i++): ?>
-                            <td>
-                                <textarea class="provenance-col"
-                                          name="provenance_tables[0][rows][0][col<?php echo $i; ?>]"
-                                          rows="1"></textarea>
-                            </td>
+                            <td><textarea class="provenance-col" name="provenance_tables[0][rows][0][col<?php echo $i; ?>]" rows="1"></textarea></td>
                         <?php endfor; ?>
                         <td style="text-align: center;">
                             <button type="button" class="button delete-provenance-row">Delete Row</button>
