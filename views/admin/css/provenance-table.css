@@ -35,18 +35,20 @@
 .provenance-table textarea.provenance-col,
 .provenance-table textarea.provenance-notes {
     width: 100% !important;
-    padding: 0 !important;
+    padding: 2px !important;
     margin: 0 !important;
     border: none !important;
     font-size: 13px;
     font-family: inherit;
     box-sizing: border-box !important;
     resize: vertical;
-    overflow-y: auto;
-    min-height: 20px;
+    overflow-y: hidden;
+    height: auto !important;
+    min-height: 18px !important;
+    max-height: none !important;
     display: block !important;
     vertical-align: top !important;
-    line-height: normal !important;
+    line-height: 1.2 !important;
 }
 
 .provenance-table textarea.provenance-col:focus {
