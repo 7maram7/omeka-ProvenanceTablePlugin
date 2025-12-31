@@ -23,8 +23,7 @@
     padding: 0;
     border: 1px solid #ddd;
     vertical-align: top;
-    line-height: 0;
-    font-size: 0;
+    line-height: 1;
 }
 
 /* Action column (delete button) should be centered vertically */
@@ -36,20 +35,20 @@
 .provenance-table textarea.provenance-col,
 .provenance-table textarea.provenance-notes {
     width: 100% !important;
-    padding: 2px !important;
+    padding: 2px 4px !important;
     margin: 0 !important;
     border: none !important;
-    font-size: 13px;
+    font-size: 14px !important;
     font-family: inherit;
     box-sizing: border-box !important;
     resize: vertical;
     overflow-y: hidden;
-    height: auto !important;
-    min-height: 18px !important;
+    height: 22px !important;
+    min-height: unset !important;
     max-height: none !important;
     display: block !important;
     vertical-align: top !important;
-    line-height: 1.2 !important;
+    line-height: 1.3 !important;
 }
 
 .provenance-table textarea.provenance-col:focus {
