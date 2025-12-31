@@ -37,7 +37,6 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         'admin_items_form_tabs',
     );
 
-
     /**
      * Install the plugin.
      */
@@ -172,6 +171,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
                     $db->query($sql, array($tableId, $itemId));
                 }
             }
+
         }
 
         // Upgrade to version 5.0.0 - Convert from 4 columns to 3 columns
@@ -180,7 +180,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             $columns = $db->fetchAll("SHOW COLUMNS FROM `{$db->prefix}provenance_data` LIKE 'col4'");
 
             if (!empty($columns)) {
-                // Migrate col4 data to col3
+                // Migrate col4 data to col3 (move Characteristics data, discard Date data)
                 $sql = "UPDATE `{$db->prefix}provenance_data` SET col3 = col4";
                 $db->query($sql);
 
@@ -231,6 +231,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             }
             if (isset($post['provenance_col' . $i . '_width'])) {
                 $width = (int)$post['provenance_col' . $i . '_width'];
+                // Ensure width is between 1 and 100
                 if ($width < 1) $width = 5;
                 if ($width > 100) $width = 100;
                 set_option('provenance_col' . $i . '_width', $width);
@@ -239,12 +240,15 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
 
         // Save enabled item types
         if (isset($post['provenance_enable_mode']) && $post['provenance_enable_mode'] === 'specific') {
+            // Save specific item types if any are selected
             if (isset($post['provenance_enabled_item_types']) && is_array($post['provenance_enabled_item_types'])) {
                 set_option('provenance_enabled_item_types', serialize($post['provenance_enabled_item_types']));
             } else {
+                // No types selected, default to all
                 set_option('provenance_enabled_item_types', 'all');
             }
         } else {
+            // Mode is 'all' or not set
             set_option('provenance_enabled_item_types', 'all');
         }
     }
@@ -300,13 +304,25 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             return;
         }
 
-        // Create cleaned structure (for debug + to save)
-        $cleanTables = $post['provenance_tables'];
+        // DEBUG: Write raw POST data to file
+        $debugFile = dirname(__FILE__) . '/debug_post.txt';
+        $debugData = "=== DEBUG " . date('Y-m-d H:i:s') . " ===\n";
+        if (isset($post['provenance_tables'][0]['rows'][0]['col1'])) {
+            $debugData .= "RAW POST col1:\n";
+            $debugData .= var_export($post['provenance_tables'][0]['rows'][0]['col1'], true) . "\n";
+        }
+        if (isset($post['provenance_tables'][0]['rows'][0]['col2'])) {
+            $debugData .= "RAW POST col2:\n";
+            $debugData .= var_export($post['provenance_tables'][0]['rows'][0]['col2'], true) . "\n";
+        }
+        $debugData .= "========================\n\n";
+        file_put_contents($debugFile, $debugData, FILE_APPEND);
 
         // Store in request registry to save after item is saved
+        // TEMPORARILY NOT STRIPPING - to see what raw POST data contains
         Zend_Registry::set('provenance_data_to_save', array(
             'item_id' => $item->id,
-            'data' => $cleanTables
+            'data' => $post['provenance_tables']
         ));
     }
 
@@ -456,7 +472,6 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
 
     /**
      * Get provenance data for an item (all tables with their rows).
-     * Adds debug to show what is read from DB on Edit.
      */
     protected function _getProvenanceData($item)
     {
@@ -477,10 +492,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             $sql = "SELECT * FROM {$db->prefix}provenance_data
                     WHERE table_id = ?
                     ORDER BY row_order ASC";
-            $rows = $db->fetchAll($sql, array($table['id']));
-
-
-            $table['rows'] = $rows;
+            $table['rows'] = $db->fetchAll($sql, array($table['id']));
         }
 
         return $tables;
@@ -488,12 +500,10 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
 
     /**
      * Save provenance data for an item (multiple tables).
-     * Adds debug to show what goes in + what is stored in DB after save.
      */
     public static function saveProvenanceData($itemId, $data)
     {
         $db = get_db();
-
 
         // Delete existing tables and data for this item
         $db->query("DELETE FROM {$db->prefix}provenance_data WHERE item_id = ?", array($itemId));
@@ -504,42 +514,57 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             $tableOrder = 0;
 
             foreach ($data as $tableData) {
-                // Notes
+                // Create table entry - strip ALL forms of br tags
                 $notes = isset($tableData['notes']) ? trim($tableData['notes']) : '';
-                $notes = (string)$notes;
-
+                $notes = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $notes); // HTML escaped
+                $notes = preg_replace('/<br\s*\/?\s*>/i', "\n", $notes); // Literal tags
                 $sql = "INSERT INTO {$db->prefix}provenance_tables
                         (item_id, table_order, notes)
                         VALUES (?, ?, ?)";
                 $db->query($sql, array($itemId, $tableOrder++, $notes));
                 $tableId = $db->lastInsertId();
 
-                // Rows
+                // Insert rows for this table
                 if (isset($tableData['rows']) && is_array($tableData['rows'])) {
                     $rowOrder = 0;
-
                     foreach ($tableData['rows'] as $row) {
-                        // Normalize cols
-                        $col1 = isset($row['col1']) ? (string)$row['col1'] : '';
-                        $col2 = isset($row['col2']) ? (string)$row['col2'] : '';
-                        $col3 = isset($row['col3']) ? (string)$row['col3'] : '';
-
-                        // Only save rows that have data
-                        if (trim($col1) === '' && trim($col2) === '' && trim($col3) === '') {
-                            continue;
+                        // Check if row has any non-empty data
+                        $hasData = false;
+                        for ($i = 1; $i <= 3; $i++) {
+                            $value = isset($row['col' . $i]) ? trim($row['col' . $i]) : '';
+                            if ($value !== '') {
+                                $hasData = true;
+                                break;
+                            }
                         }
 
-                        $sql = "INSERT INTO {$db->prefix}provenance_data
-                                (table_id, item_id, row_order, col1, col2, col3)
-                                VALUES (?, ?, ?, ?, ?, ?)";
-                        $db->query($sql, array(
-                            $tableId,
-                            $itemId,
-                            $rowOrder++,
-                            $col1,
-                            $col2,
-                            $col3
-                        ));
+                        if ($hasData) {
+                            // Strip ALL forms of br tags from column data before saving
+                            $col1 = isset($row['col1']) ? trim($row['col1']) : '';
+                            $col2 = isset($row['col2']) ? trim($row['col2']) : '';
+                            $col3 = isset($row['col3']) ? trim($row['col3']) : '';
+
+                            // Strip HTML escaped br tags
+                            $col1 = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $col1);
+                            $col2 = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $col2);
+                            $col3 = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $col3);
+                            // Strip literal br tags
+                            $col1 = preg_replace('/<br\s*\/?\s*>/i', "\n", $col1);
+                            $col2 = preg_replace('/<br\s*\/?\s*>/i', "\n", $col2);
+                            $col3 = preg_replace('/<br\s*\/?\s*>/i', "\n", $col3);
+
+                            $sql = "INSERT INTO {$db->prefix}provenance_data
+                                    (table_id, item_id, row_order, col1, col2, col3)
+                                    VALUES (?, ?, ?, ?, ?, ?)";
+                            $db->query($sql, array(
+                                $tableId,
+                                $itemId,
+                                $rowOrder++,
+                                $col1,
+                                $col2,
+                                $col3
+                            ));
+                        }
                     }
                 }
             }
