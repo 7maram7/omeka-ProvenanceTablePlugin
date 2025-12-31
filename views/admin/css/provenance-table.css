@@ -23,6 +23,7 @@
     padding: 0;
     border: 1px solid #ddd;
     vertical-align: top;
+    line-height: 0;
 }
 
 /* Action column (delete button) should be centered vertically */
