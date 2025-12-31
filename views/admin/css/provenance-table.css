@@ -20,10 +20,11 @@
 }
 
 .provenance-table tbody td {
-    padding: 0;
+    padding: 0 !important;
     border: 1px solid #ddd;
     vertical-align: top;
     line-height: 1;
+    height: 27px !important;
 }
 
 /* Action column (delete button) should be centered vertically */
