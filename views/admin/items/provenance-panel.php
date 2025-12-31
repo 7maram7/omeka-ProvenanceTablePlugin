@@ -15,17 +15,16 @@
                               class="provenance-notes textinput"
                               rows="3"
                               style="width: 100%;"><?php
-                        // Get the text and strip ALL forms of br tags
+                        // Strip br tags and rebuild without blank lines
                         $notes = $tableData['notes'];
-                        // Strip HTML escaped br tags
                         $notes = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $notes);
-                        // Strip literal br tags
                         $notes = preg_replace('/<br\s*\/?\s*>/i', "\n", $notes);
-                        // Normalize line endings
                         $notes = str_replace(array("\r\n", "\r"), "\n", $notes);
-                        // Collapse multiple consecutive newlines into single newlines
-                        $notes = preg_replace("/\n\s*\n+/", "\n", $notes);
-                        echo html_escape($notes);
+                        // Split into lines, remove empty lines, rejoin
+                        $lines = explode("\n", $notes);
+                        $lines = array_map('trim', $lines);
+                        $lines = array_filter($lines, function($line) { return $line !== ''; });
+                        echo html_escape(implode("\n", $lines));
                     ?></textarea>
                 </div>
 
@@ -51,17 +50,16 @@
                                             <textarea class="textinput provenance-col"
                                                       name="provenance_tables[<?php echo $tableIndex; ?>][rows][<?php echo $rowIndex; ?>][col<?php echo $i; ?>]"
                                                       rows="2"><?php
-                                                // Get the text and strip ALL forms of br tags
+                                                // Strip br tags and rebuild without blank lines
                                                 $text = $row['col' . $i];
-                                                // Strip HTML escaped br tags
                                                 $text = preg_replace('/&lt;br\s*\/?\s*&gt;/i', "\n", $text);
-                                                // Strip literal br tags
                                                 $text = preg_replace('/<br\s*\/?\s*>/i', "\n", $text);
-                                                // Normalize line endings
                                                 $text = str_replace(array("\r\n", "\r"), "\n", $text);
-                                                // Collapse multiple consecutive newlines into single newlines
-                                                $text = preg_replace("/\n\s*\n+/", "\n", $text);
-                                                echo html_escape($text);
+                                                // Split into lines, remove empty lines, rejoin
+                                                $lines = explode("\n", $text);
+                                                $lines = array_map('trim', $lines);
+                                                $lines = array_filter($lines, function($line) { return $line !== ''; });
+                                                echo html_escape(implode("\n", $lines));
                                             ?></textarea>
                                         </td>
                                     <?php endfor; ?>
