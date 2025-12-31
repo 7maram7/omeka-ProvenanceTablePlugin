@@ -83,7 +83,7 @@ function provenance_table_textarea_value($value)
                                         <td>
                                             <textarea class="provenance-col"
                                                       name="provenance_tables[<?php echo $tableIndex; ?>][rows][<?php echo $rowIndex; ?>][col<?php echo $i; ?>]"
-                                                      rows="2"><?php
+                                                      rows="1"><?php
                                                 $key  = 'col' . $i;
                                                 $text = isset($row[$key]) ? $row[$key] : '';
 
@@ -117,7 +117,7 @@ function provenance_table_textarea_value($value)
                                     <td>
                                         <textarea class="provenance-col"
                                                   name="provenance_tables[<?php echo $tableIndex; ?>][rows][0][col<?php echo $i; ?>]"
-                                                  rows="2"></textarea>
+                                                  rows="1"></textarea>
                                     </td>
                                 <?php endfor; ?>
                                 <td style="text-align: center;">
@@ -167,7 +167,7 @@ function provenance_table_textarea_value($value)
                             <td>
                                 <textarea class="provenance-col"
                                           name="provenance_tables[0][rows][0][col<?php echo $i; ?>]"
-                                          rows="2"></textarea>
+                                          rows="1"></textarea>
                             </td>
                         <?php endfor; ?>
                         <td style="text-align: center;">

@@ -122,7 +122,7 @@
         $row.append('<td class="drag-handle" style="text-align: center; cursor: move;"><span class="drag-icon">⋮⋮</span></td>');
         for (var j = 1; j <= numColumns; j++) {
             var $td = $('<td></td>');
-            var $textarea = $('<textarea class="textinput provenance-col" name="provenance_tables[' + tableCount + '][rows][0][col' + j + ']" rows="2"></textarea>');
+            var $textarea = $('<textarea class="textinput provenance-col" name="provenance_tables[' + tableCount + '][rows][0][col' + j + ']" rows="1"></textarea>');
             $td.append($textarea);
             $row.append($td);
         }
@@ -182,7 +182,7 @@
 
         for (var i = 1; i <= numColumns; i++) {
             var $td = $('<td></td>');
-            var $textarea = $('<textarea class="textinput provenance-col" name="provenance_tables[' + tableIndex + '][rows][0][col' + i + ']" rows="2"></textarea>');
+            var $textarea = $('<textarea class="textinput provenance-col" name="provenance_tables[' + tableIndex + '][rows][0][col' + i + ']" rows="1"></textarea>');
             $td.append($textarea);
             $newRow.append($td);
         }

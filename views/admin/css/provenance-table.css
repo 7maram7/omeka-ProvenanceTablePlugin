@@ -42,7 +42,7 @@
     box-sizing: border-box;
     resize: vertical;
     overflow-y: auto;
-    min-height: 40px;
+    min-height: 20px;
     display: block;
     vertical-align: top;
 }
