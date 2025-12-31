@@ -38,6 +38,9 @@ function provenance_table_textarea_value($value)
     // Normalize CRLF/CR
     $value = str_replace(array("\r\n", "\r"), "\n", $value);
 
+    // Collapse multiple consecutive newlines into single newlines
+    $value = preg_replace("/\n+/", "\n", $value);
+
     return $value;
 }
 ?>

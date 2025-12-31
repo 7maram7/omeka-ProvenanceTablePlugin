@@ -27,13 +27,17 @@
 
             <div class="provenance-table-section" style="margin-bottom: 30px;">
                 <?php if (!empty(trim($tableData['notes']))): ?>
-                    <div class="provenance-variety-notes pt-multiline">
+                    <div class="provenance-variety-notes">
                         <?php
-                            // Normalize any injected <br> tags and collapse accidental blank lines
-                            $cleanedNotes = preg_replace('/<br\s*\/?\s*>/i', "\n", (string) $tableData['notes']);
-                            $cleanedNotes = str_replace(array("\r\n", "\r"), "\n", $cleanedNotes);
-                            $cleanedNotes = preg_replace("/\n[ \t]*\n+/", "\n", $cleanedNotes);
-                            echo html_escape($cleanedNotes);
+                            // Strip br tags, split into lines, filter blanks, render as divs
+                            $text = preg_replace('/<br\s*\/?\s*>/i', "\n", (string) $tableData['notes']);
+                            $text = str_replace(array("\r\n", "\r"), "\n", $text);
+                            $lines = explode("\n", $text);
+                            $lines = array_map('trim', $lines);
+                            $lines = array_filter($lines, function($line) { return $line !== ''; });
+                            foreach ($lines as $line) {
+                                echo '<div style="margin: 0; padding: 0; line-height: 1.4;">' . html_escape($line) . '</div>';
+                            }
                         ?>
                     </div>
                 <?php endif; ?>
@@ -62,12 +66,16 @@
                                 ?>
                                 <tr>
                                     <?php for ($i = 1; $i <= 3; $i++): ?>
-                                        <td class="pt-multiline"><?php
-                                            // Normalize any injected <br> tags and collapse accidental blank lines
-                                            $cleanedText = preg_replace('/<br\s*\/?\s*>/i', "\n", (string) $row['col' . $i]);
-                                            $cleanedText = str_replace(array("\r\n", "\r"), "\n", $cleanedText);
-                                            $cleanedText = preg_replace("/\n[ \t]*\n+/", "\n", $cleanedText);
-                                            echo html_escape($cleanedText);
+                                        <td><?php
+                                            // Strip br tags, split into lines, filter blanks, render as divs
+                                            $text = preg_replace('/<br\s*\/?\s*>/i', "\n", (string) $row['col' . $i]);
+                                            $text = str_replace(array("\r\n", "\r"), "\n", $text);
+                                            $lines = explode("\n", $text);
+                                            $lines = array_map('trim', $lines);
+                                            $lines = array_filter($lines, function($line) { return $line !== ''; });
+                                            foreach ($lines as $line) {
+                                                echo '<div style="margin: 0; padding: 0; line-height: 1.4;">' . html_escape($line) . '</div>';
+                                            }
                                         ?></td>
                                     <?php endfor; ?>
                                 </tr>

@@ -504,9 +504,12 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             $tableOrder = 0;
 
             foreach ($data as $tableData) {
-                // Notes
-                $notes = isset($tableData['notes']) ? trim($tableData['notes']) : '';
-                $notes = (string)$notes;
+                // Notes - strip br and collapse newlines
+                $notes = isset($tableData['notes']) ? $tableData['notes'] : '';
+                $notes = preg_replace('/<br\s*\/?\s*>/i', "\n", $notes);
+                $notes = str_replace(array("\r\n", "\r"), "\n", $notes);
+                $notes = preg_replace("/\n+/", "\n", $notes);
+                $notes = trim($notes);
 
                 $sql = "INSERT INTO {$db->prefix}provenance_tables
                         (item_id, table_order, notes)
@@ -519,10 +522,21 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
                     $rowOrder = 0;
 
                     foreach ($tableData['rows'] as $row) {
-                        // Normalize cols
-                        $col1 = isset($row['col1']) ? (string)$row['col1'] : '';
-                        $col2 = isset($row['col2']) ? (string)$row['col2'] : '';
-                        $col3 = isset($row['col3']) ? (string)$row['col3'] : '';
+                        // Normalize cols - strip br and collapse newlines
+                        $col1 = isset($row['col1']) ? $row['col1'] : '';
+                        $col2 = isset($row['col2']) ? $row['col2'] : '';
+                        $col3 = isset($row['col3']) ? $row['col3'] : '';
+
+                        // Strip br tags and collapse newlines
+                        $col1 = preg_replace('/<br\s*\/?\s*>/i', "\n", $col1);
+                        $col2 = preg_replace('/<br\s*\/?\s*>/i', "\n", $col2);
+                        $col3 = preg_replace('/<br\s*\/?\s*>/i', "\n", $col3);
+                        $col1 = str_replace(array("\r\n", "\r"), "\n", $col1);
+                        $col2 = str_replace(array("\r\n", "\r"), "\n", $col2);
+                        $col3 = str_replace(array("\r\n", "\r"), "\n", $col3);
+                        $col1 = preg_replace("/\n+/", "\n", $col1);
+                        $col2 = preg_replace("/\n+/", "\n", $col2);
+                        $col3 = preg_replace("/\n+/", "\n", $col3);
 
                         // Only save rows that have data
                         if (trim($col1) === '' && trim($col2) === '' && trim($col3) === '') {
