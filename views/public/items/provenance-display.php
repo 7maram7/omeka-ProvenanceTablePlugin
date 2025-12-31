@@ -29,8 +29,10 @@
                 <?php if (!empty(trim($tableData['notes']))): ?>
                     <div class="provenance-variety-notes" style="margin-bottom: 10px; white-space: pre-wrap; line-height: 1.0;">
                         <?php
-                            // Strip <br> tags and let CSS handle line breaks
+                            // Strip <br> tags and collapse multiple newlines into single newlines
                             $cleanedNotes = preg_replace('/<br\s*\/?\s*>/i', "\n", $tableData['notes']);
+                            $cleanedNotes = str_replace(array("\r\n", "\r"), "\n", $cleanedNotes);
+                            $cleanedNotes = preg_replace("/\n[ \t]*\n+/", "\n", $cleanedNotes);
                             echo html_escape($cleanedNotes);
                         ?>
                     </div>
@@ -61,8 +63,10 @@
                                 <tr>
                                     <?php for ($i = 1; $i <= 3; $i++): ?>
                                         <td style="white-space: pre-wrap; line-height: 1.0;"><?php
-                                            // Strip all variations of <br> tags and convert to newlines
+                                            // Strip <br> tags and collapse multiple newlines into single newlines
                                             $cleanedText = preg_replace('/<br\s*\/?\s*>/i', "\n", $row['col' . $i]);
+                                            $cleanedText = str_replace(array("\r\n", "\r"), "\n", $cleanedText);
+                                            $cleanedText = preg_replace("/\n[ \t]*\n+/", "\n", $cleanedText);
                                             echo html_escape($cleanedText);
                                         ?></td>
                                     <?php endfor; ?>
