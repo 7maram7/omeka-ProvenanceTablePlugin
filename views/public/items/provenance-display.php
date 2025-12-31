@@ -27,13 +27,19 @@
 
             <div class="provenance-table-section" style="margin-bottom: 30px;">
                 <?php if (!empty(trim($tableData['notes']))): ?>
-                    <div class="provenance-variety-notes pt-multiline">
+                    <div class="provenance-variety-notes" style="margin-bottom: 10px; line-height: 1.0;">
                         <?php
-                            // Normalize any injected <br> tags and collapse accidental blank lines
-                            $cleanedNotes = preg_replace('/<br\s*\/?\s*>/i', "\n", (string) $tableData['notes']);
+                            // Strip <br> tags and split into lines
+                            $cleanedNotes = preg_replace('/<br\s*\/?\s*>/i', "\n", $tableData['notes']);
                             $cleanedNotes = str_replace(array("\r\n", "\r"), "\n", $cleanedNotes);
-                            $cleanedNotes = preg_replace("/\n[ \t]*\n+/", "\n", $cleanedNotes);
-                            echo html_escape($cleanedNotes);
+                            // Split by newlines, trim each line, filter out empty lines, then rejoin
+                            $lines = explode("\n", $cleanedNotes);
+                            $lines = array_map('trim', $lines);
+                            $lines = array_filter($lines, function($line) { return $line !== ''; });
+                            // Output each line as a div for precise spacing control
+                            foreach ($lines as $line) {
+                                echo '<div style="margin: 0; padding: 0;">' . html_escape($line) . '</div>';
+                            }
                         ?>
                     </div>
                 <?php endif; ?>
@@ -62,12 +68,18 @@
                                 ?>
                                 <tr>
                                     <?php for ($i = 1; $i <= 3; $i++): ?>
-                                        <td class="pt-multiline"><?php
-                                            // Normalize any injected <br> tags and collapse accidental blank lines
-                                            $cleanedText = preg_replace('/<br\s*\/?\s*>/i', "\n", (string) $row['col' . $i]);
+                                        <td style="line-height: 1.0;"><?php
+                                            // Strip <br> tags and split into lines
+                                            $cleanedText = preg_replace('/<br\s*\/?\s*>/i', "\n", $row['col' . $i]);
                                             $cleanedText = str_replace(array("\r\n", "\r"), "\n", $cleanedText);
-                                            $cleanedText = preg_replace("/\n[ \t]*\n+/", "\n", $cleanedText);
-                                            echo html_escape($cleanedText);
+                                            // Split by newlines, trim each line, filter out empty lines, then rejoin
+                                            $lines = explode("\n", $cleanedText);
+                                            $lines = array_map('trim', $lines);
+                                            $lines = array_filter($lines, function($line) { return $line !== ''; });
+                                            // Output each line as a div for precise spacing control
+                                            foreach ($lines as $line) {
+                                                echo '<div style="margin: 0; padding: 0;">' . html_escape($line) . '</div>';
+                                            }
                                         ?></td>
                                     <?php endfor; ?>
                                 </tr>
