@@ -27,6 +27,10 @@
     height: 27px !important;
 }
 
+.provenance-table tbody tr {
+    height: auto !important;
+}
+
 /* Action column (delete button) should be centered vertically */
 .provenance-table tbody td:last-child {
     vertical-align: middle;
