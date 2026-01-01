@@ -126,7 +126,7 @@
             $td.append($textarea);
             $row.append($td);
         }
-        $row.append('<td style="text-align: center;"><button type="button" class="button delete-provenance-row">Delete Row</button></td>');
+        $row.append('<td style="text-align: center;"><button type="button" class="button delete-provenance-row">Delete</button></td>');
         $tbody.append($row);
         $table.append($tbody);
 
@@ -188,7 +188,7 @@
         }
 
         var $actionTd = $('<td style="text-align: center;"></td>');
-        var $deleteBtn = $('<button type="button" class="button delete-provenance-row">Delete Row</button>');
+        var $deleteBtn = $('<button type="button" class="button delete-provenance-row">Delete</button>');
         $actionTd.append($deleteBtn);
         $newRow.append($actionTd);
 

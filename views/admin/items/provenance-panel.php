@@ -100,7 +100,7 @@ function provenance_table_textarea_value($value)
                                     <?php endfor; ?>
 
                                     <td style="text-align: center;">
-                                        <button type="button" class="button delete-provenance-row">Delete Row</button>
+                                        <button type="button" class="button delete-provenance-row">Delete</button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -113,7 +113,7 @@ function provenance_table_textarea_value($value)
                                     <td><textarea class="provenance-col" name="provenance_tables[<?php echo $tableIndex; ?>][rows][0][col<?php echo $i; ?>]" rows="1"></textarea></td>
                                 <?php endfor; ?>
                                 <td style="text-align: center;">
-                                    <button type="button" class="button delete-provenance-row">Delete Row</button>
+                                    <button type="button" class="button delete-provenance-row">Delete</button>
                                 </td>
                             </tr>
                         <?php endif; ?>
@@ -159,7 +159,7 @@ function provenance_table_textarea_value($value)
                             <td><textarea class="provenance-col" name="provenance_tables[0][rows][0][col<?php echo $i; ?>]" rows="1"></textarea></td>
                         <?php endfor; ?>
                         <td style="text-align: center;">
-                            <button type="button" class="button delete-provenance-row">Delete Row</button>
+                            <button type="button" class="button delete-provenance-row">Delete</button>
                         </td>
                     </tr>
                 </tbody>
