@@ -273,7 +273,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         $columnWidths = array();
         for ($i = 1; $i <= 3; $i++) {
             $columnNames[$i] = get_option('provenance_col' . $i . '_name') ?: 'Column ' . $i;
-            $columnWidths[$i] = (int)get_option('provenance_col' . $i . '_width') ?: (($i == 1) ? 5 : 30);
+            $columnWidths[$i] = (int)get_option('provenance_col' . $i . '_width') ?: (($i == 1) ? 6 : 30);
         }
 
         // Generate the HTML content for the tab
@@ -342,7 +342,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
 
         // Only load on items add/edit pages
         if ($controller == 'items' && ($action == 'add' || $action == 'edit' || $action == 'show')) {
-            queue_css_file('provenance-table', 'all', false, 'css', '2.6');
+            queue_css_file('provenance-table', 'all', false, 'css', '2.7');
             queue_js_file('provenance-table');
         }
     }
@@ -372,7 +372,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         $columnWidths = array();
         for ($i = 1; $i <= 3; $i++) {
             $columnNames[$i] = get_option('provenance_col' . $i . '_name') ?: 'Column ' . $i;
-            $columnWidths[$i] = (int)get_option('provenance_col' . $i . '_width') ?: (($i == 1) ? 5 : 30);
+            $columnWidths[$i] = (int)get_option('provenance_col' . $i . '_width') ?: (($i == 1) ? 6 : 30);
         }
 
         $tabName = get_option('provenance_tab_name') ?: 'Provenance';
@@ -423,7 +423,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
         $columnWidths = array();
         for ($i = 1; $i <= 3; $i++) {
             $columnNames[$i] = get_option('provenance_col' . $i . '_name') ?: 'Column ' . $i;
-            $columnWidths[$i] = (int)get_option('provenance_col' . $i . '_width') ?: (($i == 1) ? 5 : 30);
+            $columnWidths[$i] = (int)get_option('provenance_col' . $i . '_width') ?: (($i == 1) ? 6 : 30);
         }
 
         $tabName = get_option('provenance_tab_name') ?: 'Provenance';
