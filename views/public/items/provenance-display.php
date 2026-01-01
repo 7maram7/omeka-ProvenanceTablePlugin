@@ -27,18 +27,16 @@
 
             <div class="provenance-table-section" style="margin-bottom: 30px;">
                 <?php if (!empty(trim($tableData['notes']))): ?>
-                    <div class="provenance-variety-notes" style="margin-bottom: 10px; line-height: 1.0;">
+                    <div class="provenance-variety-notes">
                         <?php
-                            // Strip <br> tags and split into lines
-                            $cleanedNotes = preg_replace('/<br\s*\/?\s*>/i', "\n", $tableData['notes']);
-                            $cleanedNotes = str_replace(array("\r\n", "\r"), "\n", $cleanedNotes);
-                            // Split by newlines, trim each line, filter out empty lines, then rejoin
-                            $lines = explode("\n", $cleanedNotes);
+                            // Strip br tags, split into lines, filter blanks, render as divs
+                            $text = preg_replace('/<br\s*\/?\s*>/i', "\n", (string) $tableData['notes']);
+                            $text = str_replace(array("\r\n", "\r"), "\n", $text);
+                            $lines = explode("\n", $text);
                             $lines = array_map('trim', $lines);
                             $lines = array_filter($lines, function($line) { return $line !== ''; });
-                            // Output each line as a div for precise spacing control
                             foreach ($lines as $line) {
-                                echo '<div style="margin: 0; padding: 0;">' . html_escape($line) . '</div>';
+                                echo '<div style="margin: 0; padding: 0; line-height: 1.4;">' . html_escape($line) . '</div>';
                             }
                         ?>
                     </div>
@@ -68,17 +66,15 @@
                                 ?>
                                 <tr>
                                     <?php for ($i = 1; $i <= 3; $i++): ?>
-                                        <td style="line-height: 1.0;"><?php
-                                            // Strip <br> tags and split into lines
-                                            $cleanedText = preg_replace('/<br\s*\/?\s*>/i', "\n", $row['col' . $i]);
-                                            $cleanedText = str_replace(array("\r\n", "\r"), "\n", $cleanedText);
-                                            // Split by newlines, trim each line, filter out empty lines, then rejoin
-                                            $lines = explode("\n", $cleanedText);
+                                        <td><?php
+                                            // Strip br tags, split into lines, filter blanks, render as divs
+                                            $text = preg_replace('/<br\s*\/?\s*>/i', "\n", (string) $row['col' . $i]);
+                                            $text = str_replace(array("\r\n", "\r"), "\n", $text);
+                                            $lines = explode("\n", $text);
                                             $lines = array_map('trim', $lines);
                                             $lines = array_filter($lines, function($line) { return $line !== ''; });
-                                            // Output each line as a div for precise spacing control
                                             foreach ($lines as $line) {
-                                                echo '<div style="margin: 0; padding: 0;">' . html_escape($line) . '</div>';
+                                                echo '<div style="margin: 0; padding: 0; line-height: 1.4;">' . html_escape($line) . '</div>';
                                             }
                                         ?></td>
                                     <?php endfor; ?>
