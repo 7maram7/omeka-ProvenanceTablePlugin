@@ -22,6 +22,16 @@
         // Drag and drop disabled for testing
         // initializeSortable();
 
+        // Auto-resize all existing textareas on page load
+        $('.provenance-table textarea.provenance-col').each(function() {
+            autoResizeTextarea(this);
+        });
+
+        // Auto-resize textareas on input
+        $(document).on('input', '.provenance-table textarea.provenance-col', function() {
+            autoResizeTextarea(this);
+        });
+
         // Bind add table button
         $(document).on('click', '.add-provenance-table', function(e) {
             e.preventDefault();
@@ -46,6 +56,14 @@
             e.preventDefault();
             deleteRow($(this));
         });
+    }
+
+    /**
+     * Auto-resize textarea to fit content
+     */
+    function autoResizeTextarea(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
     }
 
     /**
@@ -193,6 +211,11 @@
         $newRow.append($actionTd);
 
         $tbody.prepend($newRow);
+
+        // Auto-resize the new textareas
+        $newRow.find('textarea.provenance-col').each(function() {
+            autoResizeTextarea(this);
+        });
 
         reindexRowsInTable($wrapper);
 
