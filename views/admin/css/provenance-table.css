@@ -42,7 +42,7 @@
     padding: 4px !important;
     margin: 0 !important;
     border: none !important;
-    font-size: 14px !important;
+    font-size: 13px !important;
     font-family: inherit;
     box-sizing: border-box !important;
     resize: vertical !important;
@@ -82,6 +82,7 @@
     -ms-user-select: none;
     vertical-align: top !important;
     padding: 0 !important;
+    width: 30px !important;
 }
 
 .drag-icon {
