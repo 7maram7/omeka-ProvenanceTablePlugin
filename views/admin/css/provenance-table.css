@@ -25,20 +25,16 @@
     border: 1px solid #ddd;
     vertical-align: top;
     line-height: 1;
-    height: 27px !important;
-    max-height: 27px !important;
 }
 
 .provenance-table tbody tr {
-    height: 27px !important;
-    max-height: 27px !important;
+    height: auto !important;
 }
 
 /* Action column (delete button) - keep it top aligned to prevent row expansion */
 .provenance-table thead th:last-child,
 .provenance-table tbody td:last-child {
     vertical-align: top !important;
-    height: 27px !important;
     width: 95px !important;
 }
 
