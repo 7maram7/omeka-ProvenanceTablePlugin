@@ -33,9 +33,10 @@
     max-height: 27px !important;
 }
 
-/* Action column (delete button) should be centered vertically */
+/* Action column (delete button) - keep it top aligned to prevent row expansion */
 .provenance-table tbody td:last-child {
-    vertical-align: middle;
+    vertical-align: top !important;
+    height: 27px !important;
 }
 
 /* Textarea Fields - Override Omeka defaults completely */
@@ -70,10 +71,13 @@
 
 .delete-provenance-row {
     font-size: 11px;
-    padding: 2px 8px !important;
-    height: 23px !important;
-    line-height: 1 !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 6px !important;
+    height: 27px !important;
+    line-height: 27px !important;
     box-sizing: border-box !important;
+    white-space: nowrap !important;
 }
 
 /* Drag and Drop Styles */
@@ -83,6 +87,10 @@
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    vertical-align: top !important;
+    height: 27px !important;
+    line-height: 27px !important;
+    padding: 0 !important;
 }
 
 .drag-icon {
@@ -90,7 +98,7 @@
     font-size: 14px;
     font-weight: bold;
     display: inline-block;
-    line-height: 1;
+    line-height: 27px !important;
 }
 
 .drag-handle:hover .drag-icon {
