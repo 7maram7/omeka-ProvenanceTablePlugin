@@ -25,10 +25,12 @@
     vertical-align: top;
     line-height: 1;
     height: 27px !important;
+    max-height: 27px !important;
 }
 
 .provenance-table tbody tr {
-    height: auto !important;
+    height: 27px !important;
+    max-height: 27px !important;
 }
 
 /* Action column (delete button) should be centered vertically */
@@ -68,7 +70,10 @@
 
 .delete-provenance-row {
     font-size: 11px;
-    padding: 3px 8px;
+    padding: 2px 8px !important;
+    height: 23px !important;
+    line-height: 1 !important;
+    box-sizing: border-box !important;
 }
 
 /* Drag and Drop Styles */
