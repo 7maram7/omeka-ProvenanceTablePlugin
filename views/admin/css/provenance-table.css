@@ -8,6 +8,7 @@
     width: 100%;
     border-collapse: collapse;
     margin: 10px 0;
+    table-layout: fixed;
 }
 
 .provenance-table thead th {
@@ -34,9 +35,11 @@
 }
 
 /* Action column (delete button) - keep it top aligned to prevent row expansion */
+.provenance-table thead th:last-child,
 .provenance-table tbody td:last-child {
     vertical-align: top !important;
     height: 27px !important;
+    width: 95px !important;
 }
 
 /* Textarea Fields - Override Omeka defaults completely */
@@ -71,9 +74,9 @@
 
 .delete-provenance-row {
     font-size: 11px;
-    display: block !important;
+    display: inline-block !important;
     margin: 0 !important;
-    padding: 0 6px !important;
+    padding: 0 8px !important;
     height: 27px !important;
     line-height: 27px !important;
     box-sizing: border-box !important;
