@@ -64,11 +64,11 @@ function provenance_table_textarea_value($value)
                 <table class="provenance-table">
                     <thead>
                         <tr>
-                            <th style="width: 10px;"></th>
+                            <th style="width: <?php echo $dragHandleWidth; ?>px;"></th>
                             <?php for ($i = 1; $i <= 3; $i++): ?>
                                 <th style="width: <?php echo $columnWidths[$i]; ?>%;"><?php echo html_escape($columnNames[$i]); ?></th>
                             <?php endfor; ?>
-                            <th style="width: 54px;">Actions</th>
+                            <th style="width: <?php echo $actionsWidth; ?>px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="provenance-table-body">
@@ -185,7 +185,9 @@ function provenance_table_textarea_value($value)
 var ProvenanceTableConfig = {
     numColumns: <?php echo $numColumns; ?>,
     columnNames: <?php echo json_encode($columnNames); ?>,
-    columnWidths: <?php echo json_encode($columnWidths); ?>
+    columnWidths: <?php echo json_encode($columnWidths); ?>,
+    dragHandleWidth: <?php echo $dragHandleWidth; ?>,
+    actionsWidth: <?php echo $actionsWidth; ?>
 };
 </script>
 

@@ -237,6 +237,22 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             }
         }
 
+        // Save drag handle width
+        if (isset($post['provenance_drag_handle_width'])) {
+            $width = (int)$post['provenance_drag_handle_width'];
+            if ($width < 1) $width = 10;
+            if ($width > 100) $width = 100;
+            set_option('provenance_drag_handle_width', $width);
+        }
+
+        // Save actions column width
+        if (isset($post['provenance_actions_width'])) {
+            $width = (int)$post['provenance_actions_width'];
+            if ($width < 1) $width = 54;
+            if ($width > 200) $width = 200;
+            set_option('provenance_actions_width', $width);
+        }
+
         // Save enabled item types
         if (isset($post['provenance_enable_mode']) && $post['provenance_enable_mode'] === 'specific') {
             if (isset($post['provenance_enabled_item_types']) && is_array($post['provenance_enabled_item_types'])) {
@@ -275,6 +291,8 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             $columnNames[$i] = get_option('provenance_col' . $i . '_name') ?: 'Column ' . $i;
             $columnWidths[$i] = (int)get_option('provenance_col' . $i . '_width') ?: (($i == 1) ? 6 : 30);
         }
+        $dragHandleWidth = (int)get_option('provenance_drag_handle_width') ?: 10;
+        $actionsWidth = (int)get_option('provenance_actions_width') ?: 54;
 
         // Generate the HTML content for the tab
         ob_start();
@@ -342,7 +360,7 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
 
         // Only load on items add/edit pages
         if ($controller == 'items' && ($action == 'add' || $action == 'edit' || $action == 'show')) {
-            queue_css_file('provenance-table', 'all', false, 'css', '2.9');
+            queue_css_file('provenance-table', 'all', false, 'css', '3.0');
             queue_js_file('provenance-table');
         }
     }
@@ -374,6 +392,8 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             $columnNames[$i] = get_option('provenance_col' . $i . '_name') ?: 'Column ' . $i;
             $columnWidths[$i] = (int)get_option('provenance_col' . $i . '_width') ?: (($i == 1) ? 6 : 30);
         }
+        $dragHandleWidth = (int)get_option('provenance_drag_handle_width') ?: 10;
+        $actionsWidth = (int)get_option('provenance_actions_width') ?: 54;
 
         $tabName = get_option('provenance_tab_name') ?: 'Provenance';
 
@@ -425,6 +445,8 @@ class ProvenanceTablePlugin extends Omeka_Plugin_AbstractPlugin
             $columnNames[$i] = get_option('provenance_col' . $i . '_name') ?: 'Column ' . $i;
             $columnWidths[$i] = (int)get_option('provenance_col' . $i . '_width') ?: (($i == 1) ? 6 : 30);
         }
+        $dragHandleWidth = (int)get_option('provenance_drag_handle_width') ?: 10;
+        $actionsWidth = (int)get_option('provenance_actions_width') ?: 54;
 
         $tabName = get_option('provenance_tab_name') ?: 'Provenance';
 

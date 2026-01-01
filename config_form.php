@@ -11,6 +11,8 @@ $col3Name = get_option('provenance_col3_name') ?: 'Characteristics';
 $col1Width = get_option('provenance_col1_width') ?: '5';
 $col2Width = get_option('provenance_col2_width') ?: '30';
 $col3Width = get_option('provenance_col3_width') ?: '65';
+$dragHandleWidth = get_option('provenance_drag_handle_width') ?: '10';
+$actionsWidth = get_option('provenance_actions_width') ?: '54';
 $enabledItemTypes = get_option('provenance_enabled_item_types') ?: 'all';
 
 // Get all item types
@@ -81,6 +83,28 @@ $itemTypes = get_db()->getTable('ItemType')->findAll();
         <input type="number" name="provenance_col3_width" id="provenance_col3_width"
                value="<?php echo html_escape($col3Width); ?>" class="textinput" size="5" min="1" max="100" />
         <p class="explanation">Width as percentage</p>
+    </div>
+</div>
+
+<hr style="margin: 20px 0;" />
+
+<div class="field">
+    <label for="provenance_drag_handle_width">Drag Handle Column Width (px)</label>
+    <div class="inputs">
+        <input type="number" name="provenance_drag_handle_width" id="provenance_drag_handle_width"
+               value="<?php echo html_escape($dragHandleWidth); ?>" class="textinput" size="5" min="1" max="100" />
+        <p class="explanation">Width in pixels for the drag/reorder column (e.g., 10)</p>
+    </div>
+</div>
+
+<hr style="margin: 20px 0;" />
+
+<div class="field">
+    <label for="provenance_actions_width">Actions Column Width (px)</label>
+    <div class="inputs">
+        <input type="number" name="provenance_actions_width" id="provenance_actions_width"
+               value="<?php echo html_escape($actionsWidth); ?>" class="textinput" size="5" min="1" max="200" />
+        <p class="explanation">Width in pixels for the Actions/Delete button column (e.g., 54)</p>
     </div>
 </div>
 
