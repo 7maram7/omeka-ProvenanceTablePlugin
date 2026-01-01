@@ -64,11 +64,11 @@ function provenance_table_textarea_value($value)
                 <table class="provenance-table">
                     <thead>
                         <tr>
-                            <th style="width: 25px;"></th>
+                            <th style="width: 20px;"></th>
                             <?php for ($i = 1; $i <= 3; $i++): ?>
                                 <th style="width: <?php echo $columnWidths[$i]; ?>%;"><?php echo html_escape($columnNames[$i]); ?></th>
                             <?php endfor; ?>
-                            <th style="width: 70px;">Actions</th>
+                            <th style="width: 60px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="provenance-table-body">

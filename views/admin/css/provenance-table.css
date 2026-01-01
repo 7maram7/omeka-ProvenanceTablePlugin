@@ -32,7 +32,7 @@
 .provenance-table thead th:last-child,
 .provenance-table tbody td:last-child {
     vertical-align: top !important;
-    width: 70px !important;
+    width: 60px !important;
 }
 
 /* Textarea Fields - Override Omeka defaults completely */
@@ -82,7 +82,7 @@
     -ms-user-select: none;
     vertical-align: top !important;
     padding: 0 !important;
-    width: 25px !important;
+    width: 20px !important;
 }
 
 .drag-icon {
