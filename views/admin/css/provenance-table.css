@@ -17,7 +17,7 @@
     text-align: left;
     font-weight: normal;
     border: 1px solid #ddd;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .provenance-table tbody td {
@@ -49,7 +49,7 @@
     padding: 4px !important;
     margin: 0 !important;
     border: none !important;
-    font-size: 14px !important;
+    font-size: 15px !important;
     font-family: inherit;
     box-sizing: border-box !important;
     resize: vertical !important;
@@ -73,7 +73,7 @@
 }
 
 .delete-provenance-row {
-    font-size: 11px;
+    font-size: 12px;
     display: inline-block !important;
     margin: 0 !important;
     padding: 0 8px !important;
@@ -98,7 +98,7 @@
 
 .drag-icon {
     color: #999;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: bold;
     display: inline-block;
     line-height: 27px !important;
