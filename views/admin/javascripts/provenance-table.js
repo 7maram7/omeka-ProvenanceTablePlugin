@@ -125,13 +125,13 @@
 
         // Add header
         var $thead = $('<thead><tr></tr></thead>');
-        $thead.find('tr').append('<th style="width: 20px;"></th>');
+        $thead.find('tr').append('<th style="width: 10px;"></th>');
         for (var i = 1; i <= numColumns; i++) {
             var colName = columnNames[i] || ('Column ' + i);
             var colWidth = columnWidths[i] || 25;
             $thead.find('tr').append('<th style="width: ' + colWidth + '%;">' + colName + '</th>');
         }
-        $thead.find('tr').append('<th style="width: 60px;">Actions</th>');
+        $thead.find('tr').append('<th style="width: 54px;">Actions</th>');
         $table.append($thead);
 
         // Add body with one empty row
