@@ -25,16 +25,20 @@
     border: 1px solid #ddd;
     vertical-align: top;
     line-height: 1;
+    height: 27px !important;
+    max-height: 27px !important;
 }
 
 .provenance-table tbody tr {
-    height: auto !important;
+    height: 27px !important;
+    max-height: 27px !important;
 }
 
 /* Action column (delete button) - keep it top aligned to prevent row expansion */
 .provenance-table thead th:last-child,
 .provenance-table tbody td:last-child {
     vertical-align: top !important;
+    height: 27px !important;
     width: 95px !important;
 }
 
@@ -49,9 +53,9 @@
     font-family: inherit;
     box-sizing: border-box !important;
     resize: vertical !important;
-    overflow: hidden !important;
-    height: auto !important;
-    min-height: auto !important;
+    overflow-y: auto !important;
+    height: 27px !important;
+    min-height: 27px !important;
     max-height: none !important;
     display: block !important;
     vertical-align: top !important;
