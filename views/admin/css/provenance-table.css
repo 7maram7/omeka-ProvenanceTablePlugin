@@ -46,8 +46,7 @@
     font-family: inherit;
     box-sizing: border-box !important;
     resize: vertical !important;
-    overflow: hidden !important;
-    height: auto !important;
+    overflow-y: auto !important;
     display: block !important;
     vertical-align: top !important;
     line-height: 1.4 !important;
